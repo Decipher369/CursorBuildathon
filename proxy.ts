@@ -1,17 +1,15 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// Routes that require auth
 const PROTECTED = ['/dashboard', '/agent', '/call-logs', '/settings', '/onboarding', '/demo', '/admin'];
 
 function isProtected(pathname: string) {
   return PROTECTED.some((p) => pathname === p || pathname.startsWith(p + '/'));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only run auth check on protected routes
   if (!isProtected(pathname)) return NextResponse.next({ request });
 
   let supabaseResponse = NextResponse.next({ request });
@@ -48,9 +46,3 @@ export async function middleware(request: NextRequest) {
 
   return supabaseResponse;
 }
-
-export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp3|wav|ico)$).*)',
-  ],
-};
