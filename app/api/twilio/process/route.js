@@ -29,7 +29,8 @@ export async function POST(request) {
       throw new Error('Missing business_id query parameter');
     }
 
-    const audioResponse = await axios.get(recordingUrl, {
+    const wavUrl = recordingUrl.endsWith('.wav') ? recordingUrl : `${recordingUrl}.wav`;
+    const audioResponse = await axios.get(wavUrl, {
       responseType: 'arraybuffer',
       auth: {
         username: process.env.TWILIO_ACCOUNT_SID,
@@ -37,8 +38,8 @@ export async function POST(request) {
       },
     });
 
-    const audio_base64_input = Buffer.from(audioResponse.data).toString('base64');
-    const transcript = await transcribeAudio(audio_base64_input);
+    const audioBuffer = Buffer.from(audioResponse.data);
+    const transcript = await transcribeAudio(audioBuffer);
     const { score: sentiment_score, label: sentiment_label } =
       await analyzeSentiment(transcript);
 
