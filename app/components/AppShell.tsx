@@ -34,8 +34,8 @@ export default function AppShell({
     .toUpperCase();
 
   return (
-    <div className="flex min-h-full bg-slate-50 text-slate-900">
-      <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col bg-slate-900 text-slate-300">
+    <div className="flex min-h-full bg-slate-950 text-slate-100">
+      <aside className="fixed inset-y-0 left-0 z-30 flex w-60 flex-col border-r border-white/[0.06] bg-slate-950 text-slate-300">
         <div className="border-b border-slate-800 px-5 py-5">
           <div className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500 text-sm font-bold text-white">

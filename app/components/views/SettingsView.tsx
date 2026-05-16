@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { Business } from '@/lib/business-types';
 
@@ -63,6 +64,19 @@ export default function SettingsView({ business }: { business: Business }) {
           {appUrl && (
             <p className="mt-3 text-xs text-slate-500">App URL: {appUrl}</p>
           )}
+        </section>
+
+        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-2 text-sm font-medium text-slate-900">Developer</h2>
+          <p className="mb-3 text-xs text-slate-500">
+            Simulate calls and view Twilio reference (not on the business dashboard).
+          </p>
+          <Link
+            href="/admin"
+            className="text-sm font-medium text-teal-600 hover:text-teal-700"
+          >
+            Open admin tools →
+          </Link>
         </section>
       </div>
     </div>
