@@ -98,7 +98,7 @@ function HeroCard({ businessName, twilioPhone }: { businessName: string; twilioP
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="relative overflow-hidden col-span-2 rounded-3xl"
+      className="relative overflow-hidden lg:col-span-2 rounded-3xl"
       style={{
         minHeight: 340,
         background:
@@ -318,14 +318,14 @@ function ReferralCard({ unique, returning }: { unique: number; returning: number
       <div className="grid grid-cols-2 gap-3">
         {/* Stats column */}
         <div className="space-y-2.5">
-          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>Unique</p>
-            <p className="text-2xl font-bold text-white"><AnimatedNumber value={unique} /></p>
-            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>callers</p>
+          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Invited</p>
+            <p className="text-2xl font-bold text-white leading-tight"><AnimatedNumber value={unique} /></p>
+            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>callers</p>
           </div>
-          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>Returning</p>
-            <p className="text-2xl font-bold text-white"><AnimatedNumber value={returning} /></p>
+          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Returning</p>
+            <p className="text-2xl font-bold text-white leading-tight"><AnimatedNumber value={returning} /></p>
           </div>
         </div>
 
@@ -334,8 +334,8 @@ function ReferralCard({ unique, returning }: { unique: number; returning: number
           <svg width="120" height="120" viewBox="0 0 120 120">
             <defs>
               <linearGradient id="refGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#582CFF" />
-                <stop offset="100%" stopColor="#4facfe" />
+                <stop offset="0%" stopColor="#43e97b" />
+                <stop offset="100%" stopColor="#38f9d7" />
               </linearGradient>
             </defs>
             <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
@@ -352,10 +352,10 @@ function ReferralCard({ unique, returning }: { unique: number; returning: number
               transform="rotate(-90 60 60)"
             />
           </svg>
-          <div className="-mt-[88px] flex flex-col items-center">
-            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Loyalty</p>
+          <div className="-mt-[88px] flex flex-col items-center text-center">
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Safety</p>
             <p className="text-2xl font-bold text-white">{score}</p>
-            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>/ 10</p>
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>Total Score</p>
           </div>
         </div>
       </div>
@@ -410,7 +410,7 @@ export default function DashboardView({ business }: { business: Business }) {
   const needsAttention = useMemo(() => computeNeedsAttention(calls).slice(0, 4), [calls]);
 
   return (
-    <div className="px-2 pt-6 pb-8 text-white">
+    <div className="text-white">
 
       {error && (
         <motion.div
@@ -424,7 +424,7 @@ export default function DashboardView({ business }: { business: Business }) {
       )}
 
       {/* Top KPI row — 4 cards */}
-      <div className="grid gap-4 grid-cols-2 xl:grid-cols-4 mb-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-4">
         <StatCard
           label="Total Calls"
           value={loading ? 0 : kpis.totalCalls}
@@ -462,14 +462,14 @@ export default function DashboardView({ business }: { business: Business }) {
       </div>
 
       {/* Hero + Satisfaction + Referral */}
-      <div className="grid gap-4 xl:grid-cols-4 mb-4">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-4 mb-4">
         <HeroCard businessName={business.name} twilioPhone={business.twilio_phone_number} />
         <SatisfactionGauge pct={loading ? 0 : kpis.positivePercent} />
         <ReferralCard unique={loading ? 0 : kpis.uniqueCallers} returning={loading ? 0 : kpis.returningCallers} />
       </div>
 
       {/* Call Volume + Intents Bar Chart */}
-      <div className="grid gap-4 xl:grid-cols-2 mb-4">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 mb-4">
 
         {/* Call Volume Area Chart — Sales Overview style */}
         <motion.div
@@ -758,7 +758,7 @@ export default function DashboardView({ business }: { business: Business }) {
       </div>
 
       {/* Sentiment + Needs Attention */}
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
 
         {/* Sentiment breakdown */}
         <motion.div

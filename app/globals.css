@@ -33,10 +33,7 @@ body::before {
   pointer-events: none;
 }
 
-body > * {
-  position: relative;
-  z-index: 1;
-}
+/* body children inherit stacking context naturally */
 
 /* Floating animated orbs */
 .orb {

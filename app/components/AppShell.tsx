@@ -44,42 +44,59 @@ export default function AppShell({
     .toUpperCase();
 
   return (
-    <div className="flex min-h-screen relative">
-      {/* Floating animated orbs (background) */}
-      <div className="orb" style={{ top: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(94,84,215,0.6), transparent 70%)', animation: 'orb-float-1 18s ease-in-out infinite' }} />
-      <div className="orb" style={{ top: '40%', right: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(0,212,255,0.4), transparent 70%)', animation: 'orb-float-2 22s ease-in-out infinite' }} />
-      <div className="orb" style={{ bottom: '-15%', left: '30%', width: '550px', height: '550px', background: 'radial-gradient(circle, rgba(186,79,255,0.45), transparent 70%)', animation: 'orb-float-3 20s ease-in-out infinite' }} />
-
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
       {/* Sidebar */}
-      <aside className="fixed inset-y-4 left-4 z-30 flex w-64 flex-col rounded-3xl glass" style={{ height: 'calc(100vh - 2rem)' }}>
+      <aside
+        style={{
+          width: '260px',
+          flexShrink: 0,
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          background: 'linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.91) 76.65%)',
+          borderRight: '1px solid rgba(255,255,255,0.07)',
+        }}
+      >
         {/* Logo */}
-        <div className="px-6 pt-6 pb-5">
-          <div className="flex items-center gap-3">
+        <div style={{ padding: '24px 24px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold text-white"
               style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
                 background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
-                boxShadow: '0 8px 24px rgba(79, 172, 254, 0.4)',
+                boxShadow: '0 8px 24px rgba(79,172,254,0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: '#fff',
+                flexShrink: 0,
               }}
             >
               CS
-              <div className="absolute inset-0 rounded-xl spin-slow" style={{ background: 'conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)', mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMaskComposite: 'xor', padding: '1px' }} />
             </div>
             <div>
-              <span className="text-base font-bold tracking-tight text-white">CallSense</span>
-              <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>AI Voice Platform</p>
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: '15px' }}>CallSense</div>
+              <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px' }}>AI Voice Platform</div>
             </div>
           </div>
         </div>
 
-        <div className="mx-5 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)' }} />
+        <div style={{ height: '1px', margin: '0 20px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)' }} />
 
-        <p className="mt-5 mb-2 px-6 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        {/* Nav section label */}
+        <div style={{ padding: '20px 24px 8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
           Pages
-        </p>
+        </div>
 
-        {/* Nav */}
-        <nav className="space-y-1 px-3">
+        {/* Nav items */}
+        <nav style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {nav.map(({ id, label, Icon }) => {
             const active = activeView === id;
             return (
@@ -87,95 +104,109 @@ export default function AppShell({
                 key={id}
                 type="button"
                 onClick={() => onNavigate(id)}
-                className="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300"
-                style={
-                  active
-                    ? {
-                        background: 'linear-gradient(127deg, rgba(6, 11, 40, 0.94) 28.26%, rgba(10, 14, 35, 0.49) 91.2%)',
-                        color: '#fff',
-                      }
-                    : {
-                        color: 'rgba(255,255,255,0.55)',
-                      }
-                }
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  fontSize: '14px',
+                  fontWeight: active ? 700 : 500,
+                  color: active ? '#fff' : 'rgba(255,255,255,0.55)',
+                  background: active
+                    ? 'linear-gradient(127deg, rgba(6,11,40,0.94) 28%, rgba(10,14,35,0.49) 91%)'
+                    : 'transparent',
+                  transition: 'all 0.2s',
+                }}
               >
                 <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all"
                   style={{
-                    background: active ? 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)' : 'rgba(255,255,255,0.08)',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    background: active
+                      ? 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)'
+                      : 'rgba(255,255,255,0.08)',
                     boxShadow: active ? '0 4px 12px rgba(79,172,254,0.4)' : 'none',
                   }}
                 >
-                  <Icon className="h-4 w-4 shrink-0" style={{ color: active ? '#fff' : 'rgba(255,255,255,0.55)' }} />
+                  <Icon style={{ width: '16px', height: '16px', color: active ? '#fff' : 'rgba(255,255,255,0.55)' }} />
                 </span>
-                <span className={active ? 'font-bold' : ''}>{label}</span>
+                {label}
               </button>
             );
           })}
 
-          <p className="mt-5 mb-2 px-3 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          {/* Tools section */}
+          <div style={{ padding: '16px 12px 8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
             Tools
-          </p>
+          </div>
 
-          <a href="/metrics" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-white/5" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(255,255,255,0.08)' }}>
-              <IconBarChart className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.65)' }} />
+          <a
+            href="/metrics"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
+              borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
+              color: 'rgba(255,255,255,0.55)', transition: 'all 0.2s',
+            }}
+          >
+            <span style={{ width: '32px', height: '32px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.08)' }}>
+              <IconBarChart style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.65)' }} />
             </span>
             Metrics
           </a>
-          <a href="/admin" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-white/5" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(255,255,255,0.08)' }}>
-              <IconFlask className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.65)' }} />
+
+          <a
+            href="/admin"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
+              borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
+              color: 'rgba(255,255,255,0.55)', transition: 'all 0.2s',
+            }}
+          >
+            <span style={{ width: '32px', height: '32px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.08)' }}>
+              <IconFlask style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.65)' }} />
             </span>
             Test Agent
           </a>
         </nav>
 
-        {/* Promo card + Upgrade button — bottom */}
-        <div className="mt-auto m-3 mb-4 space-y-3">
+        {/* Promo card — bottom */}
+        <div style={{ marginTop: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div
-            className="relative overflow-hidden rounded-2xl p-4"
             style={{
-              boxShadow: '0 10px 30px rgba(88, 44, 255, 0.35)',
+              borderRadius: '16px',
+              padding: '16px',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(88,44,255,0.35)',
             }}
           >
-            {/* Photographic waves background */}
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'url(/promo-waves.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
-            {/* Dark overlay for text contrast */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(160deg, rgba(20, 8, 50, 0.45) 0%, rgba(15, 6, 40, 0.7) 100%)',
-              }}
-            />
-
-            <div className="relative">
-              <div
-                className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)' }}
-              >
-                <IconHeadphones className="h-4 w-4 text-white" />
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/promo-waves.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(20,8,50,0.5) 0%, rgba(15,6,40,0.75) 100%)' }} />
+            <div style={{ position: 'relative' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
+                <IconHeadphones style={{ width: '16px', height: '16px', color: '#fff' }} />
               </div>
-              <p className="text-sm font-bold text-white">Need help?</p>
-              <p className="mt-0.5 text-[10px] text-white/80 leading-relaxed">
-                Please check our docs
-              </p>
+              <p style={{ color: '#fff', fontWeight: 700, fontSize: '13px', margin: '0 0 2px' }}>Need help?</p>
+              <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '10px', margin: '0 0 10px' }}>Please check our docs</p>
               <a
                 href="https://github.com/Decipher369/CursorBuildathon"
                 target="_blank"
                 rel="noopener"
-                className="mt-3 block w-full rounded-xl py-2 text-center text-[10px] font-bold tracking-wider text-white transition-all hover:opacity-90"
                 style={{
-                  background: 'rgba(0,0,0,0.5)',
-                  backdropFilter: 'blur(10px)',
+                  display: 'block', width: '100%', textAlign: 'center', padding: '8px 0',
+                  borderRadius: '10px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
+                  color: '#fff', textDecoration: 'none',
+                  background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255,255,255,0.08)',
                 }}
               >
@@ -186,10 +217,12 @@ export default function AppShell({
 
           <a
             href="/admin"
-            className="block w-full rounded-xl py-2.5 text-center text-[11px] font-bold tracking-wider text-white transition-all hover:scale-[1.02]"
             style={{
+              display: 'block', textAlign: 'center', padding: '10px 0',
+              borderRadius: '12px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em',
+              color: '#fff', textDecoration: 'none',
               background: 'linear-gradient(310deg, #4facfe 0%, #00f2fe 100%)',
-              boxShadow: '0 8px 24px rgba(79, 172, 254, 0.4)',
+              boxShadow: '0 8px 24px rgba(79,172,254,0.4)',
             }}
           >
             TEST AGENT
@@ -197,53 +230,65 @@ export default function AppShell({
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="ml-72 mr-4 min-h-screen flex-1">
+      {/* Main content */}
+      <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         {/* Top bar */}
-        <div className="sticky top-4 z-20 mt-4 flex items-center justify-between rounded-2xl glass px-5 py-3">
+        <div
+          style={{
+            position: 'sticky', top: 0, zIndex: 20,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 24px',
+            background: 'linear-gradient(127.09deg, rgba(6,11,40,0.85) 19.41%, rgba(10,14,35,0.8) 76.65%)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
           <div>
-            <p className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              Pages / <span className="text-white">{VIEW_TITLES[activeView]}</span>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+              Pages / <span style={{ color: '#fff' }}>{VIEW_TITLES[activeView]}</span>
             </p>
-            <p className="text-base font-bold text-white">{VIEW_TITLES[activeView]}</p>
+            <p style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: 0 }}>{VIEW_TITLES[activeView]}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Search */}
-            <div className="hidden md:flex items-center gap-2 rounded-xl px-3 py-2 w-56" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', width: '220px' }}>
+              <svg style={{ width: '14px', height: '14px', color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
               </svg>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Type here...</span>
+              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Type here...</span>
             </div>
 
             {/* Profile */}
-            <button className="flex items-center gap-2 rounded-xl px-3 py-2 transition-all" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <div className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)' }}>
+            <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 14px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: '#fff' }}>
                 {initials}
               </div>
-              <span className="text-xs font-semibold text-white">{business.name.split(' ')[0]}</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{business.name.split(' ')[0]}</span>
             </button>
 
-            {/* Settings cog */}
-            <button className="flex h-9 w-9 items-center justify-center rounded-xl transition-all" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {/* Settings */}
+            <button style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.5)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
               </svg>
             </button>
 
             {/* Notifications */}
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-xl transition-all" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <button style={{ position: 'relative', width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.5)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
-              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full" style={{ background: '#f5576c', boxShadow: '0 0 6px #f5576c' }} />
+              <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', borderRadius: '50%', background: '#f5576c', boxShadow: '0 0 6px #f5576c' }} />
             </button>
           </div>
         </div>
 
-        <div>{children}</div>
+        {/* Page content */}
+        <div style={{ flex: 1, padding: '24px' }}>
+          {children}
+        </div>
       </main>
     </div>
   );
