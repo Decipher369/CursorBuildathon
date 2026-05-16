@@ -1,6 +1,9 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import type { AppView, Business } from '@/lib/business-types';
+import { getSupabaseBrowser } from '@/lib/supabase-browser';
 import {
   IconAgent,
   IconBarChart,
@@ -36,6 +39,17 @@ export default function AppShell({
   onNavigate: (view: AppView) => void;
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    const supabase = getSupabaseBrowser();
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  }
+
   const initials = business.name
     .split(' ')
     .map((w) => w[0])
@@ -131,15 +145,13 @@ export default function AppShell({
           </a>
         </nav>
 
-        {/* Promo card + Upgrade button — bottom */}
+        {/* Bottom section */}
         <div className="mt-auto m-3 mb-4 space-y-3">
+          {/* Promo card */}
           <div
             className="relative overflow-hidden rounded-2xl p-4"
-            style={{
-              boxShadow: '0 10px 30px rgba(88, 44, 255, 0.35)',
-            }}
+            style={{ boxShadow: '0 10px 30px rgba(88, 44, 255, 0.35)' }}
           >
-            {/* Photographic waves background */}
             <div
               className="absolute inset-0"
               style={{
@@ -148,15 +160,10 @@ export default function AppShell({
                 backgroundPosition: 'center',
               }}
             />
-            {/* Dark overlay for text contrast */}
             <div
               className="absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(160deg, rgba(20, 8, 50, 0.45) 0%, rgba(15, 6, 40, 0.7) 100%)',
-              }}
+              style={{ background: 'linear-gradient(160deg, rgba(20, 8, 50, 0.45) 0%, rgba(15, 6, 40, 0.7) 100%)' }}
             />
-
             <div className="relative">
               <div
                 className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl"
@@ -194,6 +201,26 @@ export default function AppShell({
           >
             TEST AGENT
           </a>
+
+          {/* Sign out */}
+          <button
+            type="button"
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-[11px] font-bold uppercase tracking-widest transition-all hover:scale-[1.01] disabled:opacity-50"
+            style={{
+              background: 'rgba(245,87,108,0.1)',
+              border: '1px solid rgba(245,87,108,0.25)',
+              color: '#f5576c',
+            }}
+          >
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            {signingOut ? 'Signing out…' : 'Sign Out'}
+          </button>
         </div>
       </aside>
 
@@ -216,12 +243,23 @@ export default function AppShell({
               <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Type here...</span>
             </div>
 
-            {/* Profile */}
-            <button className="flex items-center gap-2 rounded-xl px-3 py-2 transition-all" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {/* Profile + sign out */}
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              title="Sign out"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 transition-all hover:bg-white/10 disabled:opacity-50"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
               <div className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)' }}>
                 {initials}
               </div>
               <span className="text-xs font-semibold text-white">{business.name.split(' ')[0]}</span>
+              <svg className="h-3 w-3 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
             </button>
 
             {/* Settings cog */}

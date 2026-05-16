@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Business } from '@/lib/business-types';
 import { parseFaqs, serializeFaqs, type FaqItem } from '@/lib/faqs';
 import { IconAgent, IconAlert, IconCheckCircle } from '../icons';
+import SetupAssistantView from './SetupAssistantView';
 
 const FIELD_BASE =
   'w-full rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 transition-all duration-200 focus:outline-none';
@@ -26,6 +27,7 @@ export default function AgentView({
   business: Business;
   onSaved: (updated: Business) => void;
 }) {
+  const [showAssistant, setShowAssistant] = useState(false);
   const [agentName, setAgentName] = useState(
     business.agent_name ?? 'CallSense Agent',
   );
@@ -108,7 +110,7 @@ export default function AgentView({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="card-premium relative mb-6 flex items-center gap-4 overflow-hidden p-6"
+        className="card-premium relative mb-4 flex items-center gap-4 overflow-hidden p-6"
       >
         <div
           className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full"
@@ -134,6 +136,75 @@ export default function AgentView({
             Configure how your AI receptionist answers calls.
           </p>
         </div>
+      </motion.div>
+
+      {/* AI Setup Assistant banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05, duration: 0.4 }}
+        className="mb-4 max-w-3xl"
+      >
+        <button
+          type="button"
+          onClick={() => setShowAssistant((v) => !v)}
+          className="flex w-full items-center gap-4 rounded-2xl p-4 text-left transition-all hover:scale-[1.005]"
+          style={{
+            background: showAssistant
+              ? 'rgba(79,172,254,0.1)'
+              : 'rgba(79,172,254,0.06)',
+            border: `1px solid ${showAssistant ? 'rgba(79,172,254,0.4)' : 'rgba(79,172,254,0.18)'}`,
+          }}
+        >
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg"
+            style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)', boxShadow: '0 6px 16px rgba(79,172,254,0.4)' }}
+          >
+            ✨
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-white">AI Setup Assistant</p>
+            <p className="mt-0.5 text-xs" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              Answer a few questions and let GPT-4o build your agent profile automatically
+            </p>
+          </div>
+          <svg
+            className="h-4 w-4 shrink-0 transition-transform duration-300"
+            style={{ color: 'rgba(79,172,254,0.8)', transform: showAssistant ? 'rotate(180deg)' : 'none' }}
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+
+        <AnimatePresence>
+          {showAssistant && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+            >
+              <div
+                className="mt-2 rounded-2xl p-6"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <SetupAssistantView
+                  business={business}
+                  onSaved={(updated) => {
+                    onSaved(updated);
+                    setShowAssistant(false);
+                  }}
+                  onClose={() => setShowAssistant(false)}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Status banners */}
