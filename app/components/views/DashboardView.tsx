@@ -720,129 +720,139 @@ export default function DashboardView({ business }: { business: Business }) {
         </motion.div>
       </div>
 
-      {/* Sentiment + Needs Attention */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+      {/* Recent Calls table + Activity feed — Vision UI Projects/Orders style */}
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-5">
 
-        {/* Sentiment breakdown */}
+        {/* Recent Calls — Projects table style (3/5 width) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="card-premium p-6"
+          className="card-premium p-6 lg:col-span-3"
         >
-          <p className="text-base font-bold text-white mb-1">Sentiment Breakdown</p>
-          <p className="text-xs mb-5" style={{ color: 'rgba(255,255,255,0.5)' }}>{kpis.totalCalls} calls analysed</p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-base font-bold text-white">Recent Calls</p>
+            <button style={{ color: 'rgba(255,255,255,0.4)' }}><IconMoreHorizontal className="h-4 w-4" /></button>
+          </div>
+          <div className="flex items-center gap-1.5 mb-5">
+            <span className="h-2 w-2 rounded-full" style={{ background: '#43e97b', boxShadow: '0 0 6px #43e97b' }} />
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{kpis.totalCalls} calls this week</p>
+          </div>
 
-          {kpis.totalCalls === 0 ? (
-            <p className="mt-8 text-center text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>No data yet</p>
+          {/* Table header */}
+          <div className="grid grid-cols-12 gap-2 mb-3 px-1">
+            {['CALLER', 'SENTIMENT', 'INTENT', 'RESOLUTION'].map(h => (
+              <p key={h} className={`text-[10px] font-bold uppercase tracking-widest ${h === 'CALLER' ? 'col-span-4' : h === 'INTENT' ? 'col-span-3' : 'col-span-2'} ${h === 'RESOLUTION' ? 'col-span-3' : ''}`}
+                style={{ color: 'rgba(255,255,255,0.35)' }}>{h}</p>
+            ))}
+          </div>
+          <div className="h-px mb-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
+
+          {calls.length === 0 ? (
+            <p className="py-8 text-center text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>No calls yet</p>
           ) : (
-            <div className="space-y-4">
-              {[
-                { label: 'Positive', pct: kpis.positivePercent, gradient: 'linear-gradient(90deg, #43e97b, #38f9d7)', color: '#43e97b', Icon: IconSmile },
-                { label: 'Neutral', pct: kpis.neutralPercent, gradient: 'linear-gradient(90deg, #a18cd1, #fbc2eb)', color: '#a18cd1', Icon: IconMeh },
-                { label: 'Negative', pct: kpis.negativePercent, gradient: 'linear-gradient(90deg, #f5576c, #f093fb)', color: '#f5576c', Icon: IconFrown },
-              ].map((s, i) => (
-                <div key={s.label}>
-                  <div className="mb-1.5 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: `${s.color}1a`, border: `1px solid ${s.color}33` }}>
-                        <s.Icon className="h-3.5 w-3.5" style={{ color: s.color }} />
+            <div className="space-y-1">
+              {calls.slice(0, 6).map((call, i) => {
+                const isPos = call.sentiment_label === 'positive';
+                const isNeg = call.sentiment_label === 'negative';
+                const pct = isPos ? 100 : isNeg ? 20 : 60;
+                const barColor = isPos ? '#43e97b' : isNeg ? '#f5576c' : '#a18cd1';
+                return (
+                  <motion.div
+                    key={call.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.55 + i * 0.05 }}
+                    className="grid grid-cols-12 gap-2 items-center rounded-xl px-1 py-2.5"
+                    style={{ background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}
+                  >
+                    {/* Caller */}
+                    <div className="col-span-4 flex items-center gap-2">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold text-white"
+                        style={{ background: `hsl(${(i * 47) % 360},60%,40%)` }}>
+                        {call.phone_number?.slice(-2) ?? '??'}
+                      </div>
+                      <span className="truncate font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                        {maskPhone(call.phone_number)}
                       </span>
-                      <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>{s.label}</span>
                     </div>
-                    <span className="font-bold text-white">{s.pct}%</span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{ background: s.gradient }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${s.pct}%` }}
-                      transition={{ delay: 0.6 + i * 0.1, duration: 1, ease: 'easeOut' }}
-                    />
-                  </div>
-                </div>
-              ))}
+                    {/* Sentiment */}
+                    <div className="col-span-2">
+                      <span className="rounded-full px-2 py-0.5 text-[10px] font-bold"
+                        style={{ background: `${barColor}22`, color: barColor }}>
+                        {call.sentiment_label ?? 'n/a'}
+                      </span>
+                    </div>
+                    {/* Intent */}
+                    <div className="col-span-3">
+                      <span className="truncate text-[11px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                        {call.intent ?? '—'}
+                      </span>
+                    </div>
+                    {/* Resolution bar */}
+                    <div className="col-span-3">
+                      <div className="mb-1 text-[11px] font-bold" style={{ color: '#fff' }}>{pct}%</div>
+                      <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                        <motion.div className="h-full rounded-full"
+                          style={{ background: `linear-gradient(90deg, ${barColor}, ${barColor}99)` }}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          transition={{ delay: 0.6 + i * 0.05, duration: 0.8, ease: 'easeOut' }}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </motion.div>
 
-        {/* Needs Attention */}
+        {/* Activity feed — Orders overview style (2/5 width) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.6 }}
-          className="card-premium p-6 relative overflow-hidden"
+          className="card-premium p-6 lg:col-span-2"
         >
-          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full" style={{ background: 'radial-gradient(circle, rgba(246,211,101,0.3), transparent 70%)', filter: 'blur(20px)' }} />
+          <p className="text-base font-bold text-white mb-1">Call Activity</p>
+          <div className="flex items-center gap-1.5 mb-5">
+            <span className="text-xs font-bold" style={{ color: '#43e97b' }}>+{kpis.callsToday}</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>today</span>
+          </div>
 
-          <div className="relative">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: 'linear-gradient(135deg, #f6d365, #fda085)', boxShadow: '0 6px 16px rgba(246,211,101,0.4)' }}>
-                <IconAlert className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <p className="text-base font-bold text-white">Needs Attention</p>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Escalated or negative</p>
-              </div>
-              {needsAttention.length > 0 && (
-                <span className="ml-auto rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: 'rgba(246,211,101,0.2)', color: '#f6d365' }}>
-                  {needsAttention.length}
-                </span>
-              )}
-            </div>
-
-            {needsAttention.length === 0 ? (
-              <div className="relative flex flex-col items-center justify-center gap-2 py-10">
-                {/* Glowing orb backdrop */}
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-60"
-                  style={{
-                    backgroundImage: 'url(/empty-state-orb.png)',
-                    backgroundSize: 'contain',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                  }}
-                />
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(67,233,123,0.25), rgba(56,249,215,0.12))', border: '1px solid rgba(67,233,123,0.35)', backdropFilter: 'blur(8px)' }}>
-                  <IconCheckCircle className="h-7 w-7" style={{ color: '#43e97b' }} />
-                </div>
-                <p className="relative text-sm font-bold" style={{ color: '#43e97b' }}>All clear</p>
-                <p className="relative text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>No escalations or negative calls</p>
-              </div>
+          <div className="space-y-0">
+            {calls.length === 0 ? (
+              <p className="py-8 text-center text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>No activity yet</p>
             ) : (
-              <div className="space-y-2">
-                <AnimatePresence>
-                  {needsAttention.map((call, i) => (
-                    <motion.div
-                      key={call.id}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + i * 0.07 }}
-                      className="flex items-start gap-3 rounded-xl p-3"
-                      style={{ background: 'rgba(255,255,255,0.03)' }}
-                    >
-                      <span className="mt-0.5 flex h-2 w-2 shrink-0 rounded-full" style={{ background: call.escalated ? '#f6d365' : '#f5576c', boxShadow: `0 0 8px ${call.escalated ? '#f6d365' : '#f5576c'}` }} />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{maskPhone(call.phone_number)}</span>
-                          <span
-                            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                            style={call.escalated
-                              ? { background: 'rgba(246,211,101,0.15)', color: '#f6d365' }
-                              : { background: 'rgba(245,87,108,0.15)', color: '#f5576c' }}
-                          >
-                            {call.escalated ? 'escalated' : 'negative'}
-                          </span>
-                        </div>
-                        <p className="mt-1 truncate text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                          {call.transcript?.slice(0, 80) ?? '—'}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+              calls.slice(0, 7).map((call, i) => {
+                const isPos = call.sentiment_label === 'positive';
+                const isNeg = call.sentiment_label === 'negative';
+                const iconBg = isPos ? 'linear-gradient(135deg,#43e97b,#38f9d7)' : isNeg ? 'linear-gradient(135deg,#f5576c,#f093fb)' : 'linear-gradient(135deg,#4facfe,#00f2fe)';
+                const Icon = isPos ? IconSmile : isNeg ? IconFrown : IconPhone;
+                const ts = call.created_at ? new Date(call.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+                return (
+                  <motion.div
+                    key={call.id}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 + i * 0.05 }}
+                    className="flex items-start gap-3 py-3"
+                    style={{ borderBottom: i < 6 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg mt-0.5"
+                      style={{ background: iconBg }}>
+                      <Icon className="h-3.5 w-3.5 text-white" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-white truncate">
+                        {call.intent ?? maskPhone(call.phone_number)}
+                      </p>
+                      <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{ts}</p>
+                    </div>
+                  </motion.div>
+                );
+              })
             )}
           </div>
         </motion.div>
