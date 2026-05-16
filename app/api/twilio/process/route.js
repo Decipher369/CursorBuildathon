@@ -70,13 +70,15 @@ export async function POST(request) {
 
     const { searchParams } = new URL(request.url);
     const business_id = searchParams.get('business_id');
+    const call_sid = searchParams.get('call_sid') ?? formData.get('CallSid') ?? null;
     const silenceFlag = searchParams.get('silence') === '1';
 
     if (!from) throw new Error('Missing From in Twilio webhook');
     if (!business_id) throw new Error('Missing business_id query parameter');
 
     const baseUrl = getBaseUrl();
-    const actionUrl = `${baseUrl}/api/twilio/process?business_id=${encodeURIComponent(business_id)}`;
+    const sidParam = call_sid ? `&call_sid=${encodeURIComponent(call_sid)}` : '';
+    const actionUrl = `${baseUrl}/api/twilio/process?business_id=${encodeURIComponent(business_id)}${sidParam}`;
 
     // No recording or silence redirect → warn the caller
     if (silenceFlag || !recordingUrl || recordingDuration < 1) {
@@ -103,6 +105,7 @@ export async function POST(request) {
       transcript,
       sentiment_score,
       sentiment_label,
+      call_sid,
     });
 
     let replyAudioUrl = null;

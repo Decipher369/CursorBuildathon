@@ -1,6 +1,7 @@
 export type CallRow = {
   id: string;
   phone_number: string;
+  call_sid?: string | null;
   transcript?: string;
   sentiment_label?: string;
   sentiment_score?: number;
@@ -166,6 +167,7 @@ export function normalizeCallFromApi(raw: Record<string, unknown>): CallRow {
     phone_number: String(
       raw.phone_number ?? customers?.phone_number ?? 'Unknown',
     ),
+    call_sid: (raw.call_sid as string | null | undefined) ?? null,
     transcript: raw.transcript as string | undefined,
     sentiment_label: raw.sentiment_label as string | undefined,
     sentiment_score: raw.sentiment_score as number | undefined,

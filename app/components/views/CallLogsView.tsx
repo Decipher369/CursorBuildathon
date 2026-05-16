@@ -1,277 +1,447 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Business } from '@/lib/business-types';
 import type { CallRow } from '@/lib/call-stats';
-import { callSummary, formatDuration, maskPhone } from '@/lib/call-stats';
+import { maskPhone, formatDuration } from '@/lib/call-stats';
+import CallAudioListenButton from '../CallAudioListenButton';
 import { useCalls } from '../hooks/useCalls';
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Session = {
+  key: string;           // call_sid or synthetic id
+  call_sid: string | null;
+  phone_number: string;
+  turns: CallRow[];
+  started_at: string;
+  overall_sentiment: string;
+  dominant_intent: string;
+  escalated: boolean;
+};
+
+type CallerProfile = {
+  phone_number: string;
+  sessions: Session[];
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function groupIntoSessions(calls: CallRow[]): Session[] {
+  const sidMap = new Map<string, CallRow[]>();
+  const noSidRows: CallRow[] = [];
+
+  for (const call of calls) {
+    if (call.call_sid) {
+      const bucket = sidMap.get(call.call_sid) ?? [];
+      bucket.push(call);
+      sidMap.set(call.call_sid, bucket);
+    } else {
+      noSidRows.push(call);
+    }
+  }
+
+  const sessions: Session[] = [];
+
+  for (const [sid, turns] of sidMap) {
+    const sorted = [...turns].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
+    sessions.push(buildSession(sid, sorted[0].phone_number, sorted, sid));
+  }
+
+  // Simulated / demo calls with no call_sid each become their own session
+  for (const row of noSidRows) {
+    sessions.push(buildSession(row.id, row.phone_number, [row], null));
+  }
+
+  return sessions.sort(
+    (a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime(),
+  );
+}
+
+function buildSession(
+  key: string,
+  phone_number: string,
+  turns: CallRow[],
+  call_sid: string | null,
+): Session {
+  const labels = turns.map((t) => t.sentiment_label).filter(Boolean) as string[];
+  const negCount = labels.filter((l) => l === 'negative').length;
+  const posCount = labels.filter((l) => l === 'positive').length;
+  const overall_sentiment =
+    negCount > posCount ? 'negative' : posCount > negCount ? 'positive' : 'neutral';
+
+  const intentMap = new Map<string, number>();
+  for (const t of turns) {
+    const i = t.intent ?? 'unknown';
+    intentMap.set(i, (intentMap.get(i) ?? 0) + 1);
+  }
+  const dominant_intent = [...intentMap.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'unknown';
+
+  return {
+    key,
+    call_sid,
+    phone_number,
+    turns,
+    started_at: turns[0].created_at,
+    overall_sentiment,
+    dominant_intent,
+    escalated: turns.some((t) => t.escalated),
+  };
+}
+
+function sentimentColors(label: string) {
+  if (label === 'positive') return 'bg-emerald-100 text-emerald-800';
+  if (label === 'negative') return 'bg-red-100 text-red-800';
+  return 'bg-amber-100 text-amber-800';
+}
+
 function SentimentBadge({ label }: { label?: string }) {
-  const n = label ?? 'neutral';
-  const cls =
-    n === 'positive'
-      ? 'bg-emerald-500/20 text-emerald-400 ring-emerald-500/20'
-      : n === 'negative'
-        ? 'bg-red-500/20 text-red-400 ring-red-500/20'
-        : 'bg-amber-500/20 text-amber-400 ring-amber-500/20';
+  const normalized = label ?? 'neutral';
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium capitalize ring-1 ${cls}`}>
-      {n}
+    <span
+      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize ${sentimentColors(normalized)}`}
+    >
+      {normalized}
     </span>
   );
 }
 
 function IntentBadge({ intent }: { intent?: string }) {
   return (
-    <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[11px] font-medium text-blue-400 ring-1 ring-blue-500/20 capitalize">
+    <span className="inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium capitalize text-slate-600">
       {intent ?? 'unknown'}
     </span>
   );
 }
 
-function CallDetailPanel({ call, onClose }: { call: CallRow; onClose: () => void }) {
+// ─── Session list item ────────────────────────────────────────────────────────
+
+function SessionListItem({
+  session,
+  selected,
+  onSelect,
+}: {
+  session: Session;
+  selected: boolean;
+  onSelect: () => void;
+}) {
   return (
-    <motion.aside
-      key="detail"
-      initial={{ x: 40, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 40, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-      className="fixed inset-y-0 right-0 z-40 w-full max-w-sm border-l border-white/[0.06] bg-slate-900/95 backdrop-blur-xl lg:relative lg:inset-auto lg:z-auto lg:w-96 lg:shrink-0"
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`w-full cursor-pointer border-b border-slate-100 px-4 py-3 text-left transition-colors hover:bg-teal-50/60 ${
+        selected ? 'bg-teal-50 border-l-2 border-l-teal-500' : ''
+      }`}
     >
-      <div className="flex items-start justify-between border-b border-white/[0.06] px-5 py-4">
+      <div className="flex items-start justify-between gap-2">
+        <span className="font-mono text-xs font-semibold text-slate-800">
+          {maskPhone(session.phone_number)}
+        </span>
+        <span className="shrink-0 text-xs text-slate-400">
+          {new Date(session.started_at).toLocaleString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </span>
+      </div>
+      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+        <SentimentBadge label={session.overall_sentiment} />
+        <IntentBadge intent={session.dominant_intent} />
+        {session.escalated && (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+            Escalated
+          </span>
+        )}
+        <span className="text-xs text-slate-400">
+          {session.turns.length} {session.turns.length === 1 ? 'turn' : 'turns'}
+        </span>
+      </div>
+    </button>
+  );
+}
+
+// ─── Chat thread ──────────────────────────────────────────────────────────────
+
+function ChatThread({
+  session,
+  onCallerClick,
+}: {
+  session: Session;
+  onCallerClick: (phone: string) => void;
+}) {
+  const lastAgentTurn = [...session.turns].reverse().find((t) => t.audio_base64);
+
+  return (
+    <div className="flex h-full flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
         <div>
-          <p className="font-mono text-sm font-semibold text-white">
-            {maskPhone(call.phone_number)}
+          <button
+            type="button"
+            onClick={() => onCallerClick(session.phone_number)}
+            className="font-mono text-sm font-semibold text-teal-700 underline-offset-2 hover:underline"
+            title="View caller profile"
+          >
+            {maskPhone(session.phone_number)}
+          </button>
+          <p className="text-xs text-slate-400">
+            {new Date(session.started_at).toLocaleString()} ·{' '}
+            {session.turns.length} {session.turns.length === 1 ? 'turn' : 'turns'}
+            {session.call_sid && (
+              <span className="ml-2 font-mono text-slate-300">{session.call_sid.slice(0, 16)}…</span>
+            )}
           </p>
-          <p className="text-xs text-slate-500">
-            {new Date(call.created_at).toLocaleString('en-SG')}
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <SentimentBadge label={session.overall_sentiment} />
+          <IntentBadge intent={session.dominant_intent} />
+          {session.escalated && (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+              Escalated
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Bubbles */}
+      <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+        {session.turns.map((turn, idx) => (
+          <div key={turn.id} className="space-y-2">
+            {turn.transcript && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%]">
+                  <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
+                    Caller
+                    {idx === 0 && (
+                      <span className="ml-2 normal-case text-slate-300">
+                        {new Date(turn.created_at).toLocaleTimeString(undefined, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    )}
+                  </p>
+                  <div className="rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-2.5 text-sm text-slate-800">
+                    {turn.transcript}
+                  </div>
+                </div>
+              </div>
+            )}
+            {turn.agent_response && (
+              <div className="flex justify-end">
+                <div className="max-w-[80%]">
+                  <p className="mb-1 text-right text-xs font-medium uppercase tracking-wide text-teal-400">
+                    Agent
+                  </p>
+                  <div className="rounded-2xl rounded-tr-sm bg-teal-600 px-4 py-2.5 text-sm text-white">
+                    {turn.agent_response}
+                  </div>
+                  {turn.sentiment_label && (
+                    <div className="mt-1 flex justify-end">
+                      <SentimentBadge label={turn.sentiment_label} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      {lastAgentTurn?.audio_base64 && (
+        <div className="border-t border-slate-100 px-6 py-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400">Last agent reply:</span>
+            <CallAudioListenButton audio_base64={lastAgentTurn.audio_base64} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Caller profile panel ─────────────────────────────────────────────────────
+
+function CallerProfile({
+  profile,
+  onSelectSession,
+  onClose,
+}: {
+  profile: CallerProfile;
+  onSelectSession: (session: Session) => void;
+  onClose: () => void;
+}) {
+  const totalTurns = profile.sessions.reduce((s, p) => s + p.turns.length, 0);
+  const escalatedCount = profile.sessions.filter((s) => s.escalated).length;
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-start justify-between border-b border-slate-100 px-6 py-4">
+        <div>
+          <p className="font-mono text-sm font-semibold text-slate-900">
+            {maskPhone(profile.phone_number)}
+          </p>
+          <p className="text-xs text-slate-400">
+            {profile.sessions.length} sessions · {totalTurns} total turns ·{' '}
+            {escalatedCount} escalated
           </p>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg p-1.5 text-slate-500 hover:bg-white/[0.06] hover:text-white transition-colors"
-          aria-label="Close"
+          className="text-slate-400 hover:text-slate-600"
+          aria-label="Close profile"
         >
           ✕
         </button>
       </div>
 
-      <div className="space-y-4 overflow-y-auto px-5 py-4" style={{ maxHeight: 'calc(100vh - 80px)' }}>
-        <div className="flex flex-wrap gap-2">
-          <SentimentBadge label={call.sentiment_label} />
-          <IntentBadge intent={call.intent} />
-          {call.escalated && (
-            <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[11px] font-medium text-amber-400 ring-1 ring-amber-500/20">
-              Escalated
-            </span>
-          )}
-          {call.duration_seconds != null && call.duration_seconds > 0 && (
-            <span className="rounded-full bg-white/[0.06] px-2.5 py-0.5 text-[11px] text-slate-400">
-              {formatDuration(call.duration_seconds)}
-            </span>
-          )}
-        </div>
-
-        {call.sentiment_score != null && (
-          <div>
-            <p className="mb-1.5 text-xs font-medium text-slate-500">Sentiment score</p>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
-              <motion.div
-                className="h-full rounded-full bg-teal-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.round((call.sentiment_score + 1) * 50)}%` }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
-              />
+      <div className="flex-1 overflow-y-auto">
+        {profile.sessions.map((session) => (
+          <button
+            key={session.key}
+            type="button"
+            onClick={() => onSelectSession(session)}
+            className="w-full cursor-pointer border-b border-slate-50 px-6 py-3 text-left hover:bg-teal-50/60"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-slate-500">
+                {new Date(session.started_at).toLocaleString()}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <SentimentBadge label={session.overall_sentiment} />
+                {session.escalated && (
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                    Escalated
+                  </span>
+                )}
+              </div>
             </div>
-            <p className="mt-1 text-right text-[10px] text-slate-600">
-              {call.sentiment_score.toFixed(2)}
+            <p className="mt-1 text-xs text-slate-400">
+              {session.turns.length} {session.turns.length === 1 ? 'turn' : 'turns'} ·{' '}
+              {session.dominant_intent}
             </p>
-          </div>
-        )}
-
-        {call.transcript && (
-          <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-500">Caller</p>
-            <div className="rounded-xl rounded-bl-sm bg-white/[0.06] p-3 text-sm text-slate-300 leading-relaxed">
-              {call.transcript}
-            </div>
-          </div>
-        )}
-
-        {call.agent_response && (
-          <div>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-500">Agent</p>
-            <div className="rounded-xl rounded-br-sm bg-teal-500/20 p-3 text-sm text-teal-200 leading-relaxed ring-1 ring-teal-500/20">
-              {call.agent_response}
-            </div>
-          </div>
-        )}
+            {session.turns[0]?.transcript && (
+              <p className="mt-0.5 truncate text-xs text-slate-500">
+                {session.turns[0].transcript}
+              </p>
+            )}
+          </button>
+        ))}
       </div>
-    </motion.aside>
+    </div>
   );
 }
 
+// ─── Main view ────────────────────────────────────────────────────────────────
+
 export default function CallLogsView({ business }: { business: Business }) {
   const { calls, loading, error } = useCalls(business.id);
-  const [selected, setSelected] = useState<CallRow | null>(null);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [callerProfile, setCallerProfile] = useState<CallerProfile | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const sorted = [...calls].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-  );
+  useEffect(() => {
+    setSessions(groupIntoSessions(calls));
+  }, [calls]);
+
+  const filteredSessions = sessions.filter((s) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      s.phone_number.toLowerCase().includes(q) ||
+      s.dominant_intent.toLowerCase().includes(q) ||
+      s.overall_sentiment.toLowerCase().includes(q) ||
+      s.turns.some(
+        (t) =>
+          t.transcript?.toLowerCase().includes(q) ||
+          t.agent_response?.toLowerCase().includes(q),
+      )
+    );
+  });
+
+  function openCallerProfile(phone_number: string) {
+    const callerSessions = sessions.filter((s) => s.phone_number === phone_number);
+    setCallerProfile({ phone_number, sessions: callerSessions });
+  }
+
+  function handleSelectSession(session: Session) {
+    setSelectedSession(session);
+    setCallerProfile(null);
+  }
 
   return (
-    <div className="flex min-h-full bg-slate-950">
-      <div className={`flex min-w-0 flex-1 flex-col p-4 sm:p-6 lg:p-8 ${selected ? 'lg:pr-0' : ''}`}>
-        <motion.header
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-6 flex items-center justify-between"
-        >
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Call Logs</h1>
-            <p className="mt-0.5 text-sm text-slate-400">
-              {loading ? 'Loading…' : `${sorted.length} calls recorded`}
-            </p>
-          </div>
-          {selected && (
-            <button
-              type="button"
-              onClick={() => setSelected(null)}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 text-xs text-slate-400 hover:text-white transition-colors lg:hidden"
-            >
-              ← Back
-            </button>
-          )}
-        </motion.header>
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+      {/* Session list */}
+      <aside className="flex w-80 shrink-0 flex-col border-r border-slate-200 bg-white">
+        <div className="border-b border-slate-100 px-4 py-4">
+          <h1 className="text-base font-semibold text-slate-900">Call Logs</h1>
+          <p className="text-xs text-slate-400">
+            {loading ? 'Loading…' : `${sessions.length} sessions`}
+          </p>
+          <input
+            type="search"
+            placeholder="Search calls…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-200"
+          />
+        </div>
 
         {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
-          >
+          <div className="mx-3 mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
             {error}
-          </motion.div>
+          </div>
         )}
 
-        {/* Desktop table */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="hidden overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-sm sm:block"
-        >
-          {sorted.length === 0 && !loading ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-16">
-              <span className="text-4xl opacity-30">📋</span>
-              <p className="text-sm text-slate-600">No calls yet. Run a simulation from the Dashboard.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-white/[0.06] text-xs uppercase tracking-wider text-slate-500">
-                    <th className="px-5 py-3.5 font-medium">Date</th>
-                    <th className="px-5 py-3.5 font-medium">Caller</th>
-                    <th className="px-5 py-3.5 font-medium">Duration</th>
-                    <th className="px-5 py-3.5 font-medium">Sentiment</th>
-                    <th className="px-5 py-3.5 font-medium">Intent</th>
-                    <th className="px-5 py-3.5 font-medium">Summary</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sorted.map((call, i) => (
-                    <motion.tr
-                      key={call.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.03, duration: 0.3 }}
-                      onClick={() => setSelected(call.id === selected?.id ? null : call)}
-                      className={`cursor-pointer border-b border-white/[0.04] transition-colors hover:bg-white/[0.04] ${
-                        selected?.id === call.id ? 'bg-teal-500/5' : ''
-                      }`}
-                    >
-                      <td className="whitespace-nowrap px-5 py-3.5 text-slate-400">
-                        {new Date(call.created_at).toLocaleString('en-SG')}
-                      </td>
-                      <td className="px-5 py-3.5 font-mono text-xs text-slate-300">
-                        {maskPhone(call.phone_number)}
-                      </td>
-                      <td className="px-5 py-3.5 text-slate-400">
-                        {formatDuration(call.duration_seconds)}
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <SentimentBadge label={call.sentiment_label} />
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <IntentBadge intent={call.intent} />
-                      </td>
-                      <td className="max-w-xs truncate px-5 py-3.5 text-slate-500">
-                        {callSummary(call)}
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        <div className="flex-1 overflow-y-auto">
+          {filteredSessions.length === 0 && !loading && (
+            <p className="px-4 py-8 text-center text-xs text-slate-400">
+              {searchQuery ? 'No sessions match your search.' : 'No calls yet. Run a simulation from the Dashboard.'}
+            </p>
           )}
-        </motion.div>
-
-        {/* Mobile cards */}
-        <div className="space-y-3 sm:hidden">
-          {sorted.length === 0 && !loading ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-16">
-              <span className="text-4xl opacity-30">📋</span>
-              <p className="text-sm text-slate-600">No calls yet.</p>
-            </div>
-          ) : (
-            sorted.map((call, i) => (
-              <motion.div
-                key={call.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04, duration: 0.35 }}
-                onClick={() => setSelected(call.id === selected?.id ? null : call)}
-                className={`cursor-pointer rounded-2xl border border-white/[0.06] bg-white/[0.04] p-4 transition-colors ${
-                  selected?.id === call.id ? 'ring-1 ring-teal-500/40' : ''
-                }`}
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="font-mono text-xs text-slate-300">{maskPhone(call.phone_number)}</span>
-                  <span className="text-xs text-slate-600">
-                    {new Date(call.created_at).toLocaleString('en-SG')}
-                  </span>
-                </div>
-                <div className="mb-2 flex flex-wrap gap-1.5">
-                  <SentimentBadge label={call.sentiment_label} />
-                  <IntentBadge intent={call.intent} />
-                  {call.escalated && (
-                    <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[11px] font-medium text-amber-400">
-                      Escalated
-                    </span>
-                  )}
-                </div>
-                <p className="truncate text-xs text-slate-500">{callSummary(call)}</p>
-              </motion.div>
-            ))
-          )}
+          {filteredSessions.map((session) => (
+            <SessionListItem
+              key={session.key}
+              session={session}
+              selected={selectedSession?.key === session.key}
+              onSelect={() => handleSelectSession(session)}
+            />
+          ))}
         </div>
-      </div>
+      </aside>
 
-      {/* Detail panel */}
-      <AnimatePresence>
-        {selected && (
-          <CallDetailPanel
-            key={selected.id}
-            call={selected}
-            onClose={() => setSelected(null)}
+      {/* Main panel */}
+      <main className="flex flex-1 flex-col overflow-hidden bg-slate-50">
+        {callerProfile ? (
+          <CallerProfile
+            profile={callerProfile}
+            onSelectSession={handleSelectSession}
+            onClose={() => setCallerProfile(null)}
           />
+        ) : selectedSession ? (
+          <ChatThread
+            session={selectedSession}
+            onCallerClick={openCallerProfile}
+          />
+        ) : (
+          <div className="flex flex-1 flex-col items-center justify-center text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-100 text-2xl">
+              💬
+            </div>
+            <p className="text-sm font-medium text-slate-600">Select a session to view the conversation</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Each session groups all turns of one phone call
+            </p>
+          </div>
         )}
-      </AnimatePresence>
+      </main>
     </div>
   );
 }
