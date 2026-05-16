@@ -188,24 +188,59 @@ export default function AdminView({ business }: { business: Business }) {
   );
 
   return (
-    <div className="min-h-full bg-slate-950 p-6 text-slate-100">
-      <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-widest text-amber-500/90">
-            Admin
-          </p>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Test &amp; simulate</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            {business.name} — not shown on the business dashboard
-          </p>
+    <div className="min-h-full p-6 text-slate-100">
+      {/* Hero header with cosmic background */}
+      <div
+        className="relative mb-8 overflow-hidden rounded-3xl"
+        style={{
+          minHeight: 180,
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/admin-cosmos.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.85,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(6, 11, 40, 0.92) 0%, rgba(6, 11, 40, 0.55) 50%, rgba(6, 11, 40, 0.2) 100%)',
+          }}
+        />
+
+        <div className="relative flex flex-wrap items-center justify-between gap-4 p-8">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              Admin · Pages / Test Agent
+            </p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-white" style={{ letterSpacing: '-0.02em' }}>
+              Test &amp; simulate
+            </h1>
+            <p className="mt-2 max-w-md text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              {business.name} <span style={{ color: 'rgba(255,255,255,0.4)' }}>· not shown on the business dashboard</span>
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="rounded-xl px-4 py-2.5 text-xs font-semibold tracking-wider transition-all hover:scale-[1.02]"
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(10px)',
+              color: '#fff',
+            }}
+          >
+            ← BACK TO DASHBOARD
+          </Link>
         </div>
-        <Link
-          href="/"
-          className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/5"
-        >
-          ← Back to dashboard
-        </Link>
-      </header>
+      </div>
 
       <div className="mb-6 grid gap-4 xl:grid-cols-2">
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 backdrop-blur-sm">
