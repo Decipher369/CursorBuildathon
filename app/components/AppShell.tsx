@@ -44,7 +44,47 @@ export default function AppShell({
     .toUpperCase();
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', position: 'relative' }}>
+      {/* Cyan bubble orbs floating in the centre of the page */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        {/* Large centre orb */}
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '520px', height: '520px',
+          top: '30%', left: '50%', transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(0,210,255,0.13) 0%, rgba(0,180,255,0.06) 40%, transparent 70%)',
+          filter: 'blur(40px)',
+          animation: 'wave-drift 14s ease-in-out infinite',
+        }} />
+        {/* Upper-left bubble */}
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '300px', height: '300px',
+          top: '15%', left: '35%',
+          background: 'radial-gradient(circle, rgba(0,230,255,0.11) 0%, transparent 65%)',
+          filter: 'blur(30px)',
+          animation: 'wave-drift 10s ease-in-out infinite reverse',
+        }} />
+        {/* Lower-right bubble */}
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '360px', height: '360px',
+          top: '60%', left: '62%',
+          background: 'radial-gradient(circle, rgba(0,200,255,0.1) 0%, transparent 65%)',
+          filter: 'blur(35px)',
+          animation: 'wave-drift 18s ease-in-out infinite',
+        }} />
+        {/* Small accent bubble */}
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '180px', height: '180px',
+          top: '45%', left: '42%',
+          background: 'radial-gradient(circle, rgba(80,230,255,0.14) 0%, transparent 60%)',
+          filter: 'blur(20px)',
+          animation: 'wave-drift 8s ease-in-out infinite reverse',
+        }} />
+      </div>
+
       {/* Sidebar */}
       <aside
         style={{
@@ -56,47 +96,44 @@ export default function AppShell({
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          background: 'linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.91) 76.65%)',
-          borderRight: '1px solid rgba(255,255,255,0.07)',
+          /* Dark navy base, purple glow pools at the bottom like the reference */
+          background: 'linear-gradient(180deg, #0f1535 0%, #0d1130 55%, #0b0e28 100%)',
+          borderRight: 'none',
+          position: 'relative' as const,
         }}
       >
+        {/* Purple glow blob at bottom — matches reference */}
+        <div style={{
+          position: 'absolute', bottom: '-10%', left: '-20%',
+          width: '140%', height: '55%', pointerEvents: 'none', zIndex: 0,
+          background: 'radial-gradient(ellipse 70% 60% at 50% 100%, rgba(88,44,255,0.28) 0%, transparent 70%)',
+        }} />
+
         {/* Logo */}
-        <div style={{ padding: '24px 24px 20px' }}>
+        <div style={{ position: 'relative', zIndex: 1, padding: '24px 24px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
-                boxShadow: '0 8px 24px rgba(79,172,254,0.4)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '12px',
-                fontWeight: 700,
-                color: '#fff',
-                flexShrink: 0,
-              }}
-            >
-              CS
+            <div style={{
+              width: '38px', height: '38px', borderRadius: '10px', flexShrink: 0,
+              background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+            }}>
+              <span style={{ fontSize: '16px', fontWeight: 900, color: '#0f1535', letterSpacing: '-1px' }}>CS</span>
             </div>
-            <div>
-              <div style={{ color: '#fff', fontWeight: 700, fontSize: '15px' }}>CallSense</div>
-              <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px' }}>AI Voice Platform</div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: '15px', letterSpacing: '0.04em' }}>
+              CALLSENSE
             </div>
           </div>
         </div>
 
-        <div style={{ height: '1px', margin: '0 20px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)' }} />
+        <div style={{ position: 'relative', zIndex: 1, height: '1px', margin: '0 20px 4px', background: 'rgba(255,255,255,0.08)' }} />
 
         {/* Nav section label */}
-        <div style={{ padding: '20px 24px 8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
+        <div style={{ position: 'relative', zIndex: 1, padding: '16px 24px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
           Pages
         </div>
 
         {/* Nav items */}
-        <nav style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <nav style={{ position: 'relative', zIndex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {nav.map(({ id, label, Icon }) => {
             const active = activeView === id;
             return (
@@ -105,40 +142,25 @@ export default function AppShell({
                 type="button"
                 onClick={() => onNavigate(id)}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontSize: '14px',
-                  fontWeight: active ? 700 : 500,
-                  color: active ? '#fff' : 'rgba(255,255,255,0.55)',
-                  background: active
-                    ? 'linear-gradient(127deg, rgba(6,11,40,0.94) 28%, rgba(10,14,35,0.49) 91%)'
-                    : 'transparent',
+                  display: 'flex', alignItems: 'center', gap: '12px',
+                  width: '100%', padding: '10px 12px', borderRadius: '12px',
+                  border: 'none', cursor: 'pointer', textAlign: 'left',
+                  fontSize: '14px', fontWeight: active ? 700 : 500,
+                  color: active ? '#fff' : 'rgba(255,255,255,0.5)',
+                  background: active ? 'rgba(255,255,255,0.07)' : 'transparent',
                   transition: 'all 0.2s',
                 }}
               >
-                <span
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    background: active
-                      ? 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)'
-                      : 'rgba(255,255,255,0.08)',
-                    boxShadow: active ? '0 4px 12px rgba(79,172,254,0.4)' : 'none',
-                  }}
-                >
-                  <Icon style={{ width: '16px', height: '16px', color: active ? '#fff' : 'rgba(255,255,255,0.55)' }} />
+                <span style={{
+                  width: '34px', height: '34px', borderRadius: '10px', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: active
+                    ? 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)'
+                    : 'rgba(255,255,255,0.07)',
+                  boxShadow: active ? '0 4px 14px rgba(79,172,254,0.45)' : 'none',
+                  transition: 'all 0.2s',
+                }}>
+                  <Icon style={{ width: '16px', height: '16px', color: active ? '#fff' : 'rgba(255,255,255,0.5)' }} />
                 </span>
                 {label}
               </button>
@@ -146,68 +168,80 @@ export default function AppShell({
           })}
 
           {/* Tools section */}
-          <div style={{ padding: '16px 12px 8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
+          <div style={{ padding: '16px 12px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
             Tools
           </div>
 
-          <a
-            href="/metrics"
-            style={{
+          {[
+            { href: '/metrics', label: 'Metrics',    Icon: IconBarChart },
+            { href: '/admin',   label: 'Test Agent', Icon: IconFlask    },
+          ].map(({ href, label, Icon }) => (
+            <a key={href} href={href} style={{
               display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
               borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
-              color: 'rgba(255,255,255,0.55)', transition: 'all 0.2s',
-            }}
-          >
-            <span style={{ width: '32px', height: '32px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.08)' }}>
-              <IconBarChart style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.65)' }} />
-            </span>
-            Metrics
-          </a>
-
-          <a
-            href="/admin"
-            style={{
-              display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
-              borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
-              color: 'rgba(255,255,255,0.55)', transition: 'all 0.2s',
-            }}
-          >
-            <span style={{ width: '32px', height: '32px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.08)' }}>
-              <IconFlask style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.65)' }} />
-            </span>
-            Test Agent
-          </a>
+              color: 'rgba(255,255,255,0.5)', transition: 'all 0.2s',
+            }}>
+              <span style={{ width: '34px', height: '34px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.07)' }}>
+                <Icon style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.5)' }} />
+              </span>
+              {label}
+            </a>
+          ))}
         </nav>
 
         {/* Promo card — bottom */}
-        <div style={{ marginTop: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div
-            style={{
-              borderRadius: '16px',
-              padding: '16px',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 10px 30px rgba(88,44,255,0.35)',
-            }}
-          >
-            <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/promo-waves.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(20,8,50,0.5) 0%, rgba(15,6,40,0.75) 100%)' }} />
+        <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Promo card — fluid blue wave, matches Vision UI reference */}
+          <div style={{
+            borderRadius: '20px', padding: '18px', position: 'relative', overflow: 'hidden',
+            background: 'linear-gradient(160deg, #1a237e 0%, #283593 20%, #1565c0 45%, #0288d1 65%, #4a148c 100%)',
+            boxShadow: '0 16px 40px rgba(30,50,200,0.5)',
+          }}>
+            {/* Bright liquid wave highlight — upper right */}
+            <div style={{
+              position: 'absolute', top: '-30%', right: '-15%',
+              width: '75%', height: '75%', borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(100,180,255,0.55) 0%, rgba(80,140,255,0.25) 45%, transparent 70%)',
+              filter: 'blur(18px)',
+            }} />
+            {/* Secondary wave — lower left */}
+            <div style={{
+              position: 'absolute', bottom: '-20%', left: '-10%',
+              width: '60%', height: '60%', borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(140,100,255,0.4) 0%, transparent 65%)',
+              filter: 'blur(14px)',
+            }} />
+            {/* Mid wave streak */}
+            <div style={{
+              position: 'absolute', top: '30%', left: '20%',
+              width: '70%', height: '40%',
+              background: 'radial-gradient(ellipse 100% 60% at 50% 50%, rgba(160,210,255,0.2) 0%, transparent 70%)',
+              filter: 'blur(10px)',
+              transform: 'rotate(-15deg)',
+            }} />
+
             <div style={{ position: 'relative' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-                <IconHeadphones style={{ width: '16px', height: '16px', color: '#fff' }} />
+              {/* White star badge — matches reference */}
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '12px', marginBottom: '12px',
+                background: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+              }}>
+                <svg style={{ width: '20px', height: '20px', color: '#4facfe' }} viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
               </div>
-              <p style={{ color: '#fff', fontWeight: 700, fontSize: '13px', margin: '0 0 2px' }}>Need help?</p>
-              <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '10px', margin: '0 0 10px' }}>Please check our docs</p>
+              <p style={{ color: '#fff', fontWeight: 700, fontSize: '14px', margin: '0 0 3px' }}>Need help?</p>
+              <p style={{ color: 'rgba(200,220,255,0.85)', fontSize: '11px', margin: '0 0 14px' }}>Please check our docs</p>
               <a
                 href="https://github.com/Decipher369/CursorBuildathon"
-                target="_blank"
-                rel="noopener"
+                target="_blank" rel="noopener"
                 style={{
-                  display: 'block', width: '100%', textAlign: 'center', padding: '8px 0',
-                  borderRadius: '10px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
+                  display: 'block', textAlign: 'center', padding: '10px 0',
+                  borderRadius: '10px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em',
                   color: '#fff', textDecoration: 'none',
-                  background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(16px)',
                 }}
               >
                 DOCUMENTATION
@@ -215,16 +249,14 @@ export default function AppShell({
             </div>
           </div>
 
-          <a
-            href="/admin"
-            style={{
-              display: 'block', textAlign: 'center', padding: '10px 0',
-              borderRadius: '12px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em',
-              color: '#fff', textDecoration: 'none',
-              background: 'linear-gradient(310deg, #4facfe 0%, #00f2fe 100%)',
-              boxShadow: '0 8px 24px rgba(79,172,254,0.4)',
-            }}
-          >
+          {/* Cyan pill button — "Upgrade to PRO" style */}
+          <a href="/admin" style={{
+            display: 'block', textAlign: 'center', padding: '12px 0',
+            borderRadius: '50px', fontSize: '13px', fontWeight: 700,
+            color: '#fff', textDecoration: 'none',
+            background: 'linear-gradient(90deg, #00d2ff 0%, #00b4d8 50%, #0096c7 100%)',
+            boxShadow: '0 8px 28px rgba(0,180,230,0.5)',
+          }}>
             TEST AGENT
           </a>
         </div>
@@ -238,9 +270,9 @@ export default function AppShell({
             position: 'sticky', top: 0, zIndex: 20,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '12px 24px',
-            background: 'linear-gradient(127.09deg, rgba(6,11,40,0.85) 19.41%, rgba(10,14,35,0.8) 76.65%)',
+            background: 'linear-gradient(127.09deg, rgba(6,11,40,0.88) 19.41%, rgba(8,16,45,0.82) 76.65%)',
             backdropFilter: 'blur(20px)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            borderBottom: 'none',
           }}
         >
           <div>

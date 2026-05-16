@@ -18,14 +18,18 @@ import {
   IconArrowRight,
   IconBarChart,
   IconCalendar,
+  IconCart,
   IconCheckCircle,
   IconFrown,
   IconMeh,
   IconMoreHorizontal,
   IconPhone,
+  IconRocket,
   IconSettings,
   IconSmile,
   IconUsers,
+  IconWallet,
+  IconWrench,
 } from '../icons';
 
 // ─── Animated counter ────────────────────────────────────────────────────────
@@ -102,8 +106,7 @@ function HeroCard({ businessName, twilioPhone }: { businessName: string; twilioP
       style={{
         minHeight: 340,
         background:
-          'linear-gradient(135deg, rgba(6, 11, 40, 0.94) 0%, rgba(10, 14, 35, 0.85) 60%, rgba(6, 11, 40, 0.6) 100%)',
-        border: '1px solid rgba(255,255,255,0.08)',
+          'linear-gradient(135deg, rgba(6, 11, 40, 0.94) 0%, rgba(8, 18, 50, 0.85) 60%, rgba(6, 11, 40, 0.6) 100%)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
       }}
     >
@@ -259,7 +262,7 @@ function SatisfactionGauge({ pct }: { pct: number }) {
           className="mt-3 flex w-full items-center justify-between rounded-xl px-4 py-3"
           style={{
             background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            border: 'none',
           }}
         >
           <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>0%</span>
@@ -303,12 +306,12 @@ function ReferralCard({ unique, returning }: { unique: number; returning: number
       <div className="grid grid-cols-2 gap-3">
         {/* Stats column */}
         <div className="space-y-2.5">
-          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)' }}>
             <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Invited</p>
             <p className="text-2xl font-bold text-white leading-tight"><AnimatedNumber value={unique} /></p>
             <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>callers</p>
           </div>
-          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)' }}>
             <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Returning</p>
             <p className="text-2xl font-bold text-white leading-tight"><AnimatedNumber value={returning} /></p>
           </div>
@@ -370,7 +373,7 @@ function ChartTooltip({
       className="rounded-xl px-3 py-2 text-xs"
       style={{
         background: 'rgba(13,20,64,0.92)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: 'none',
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
         boxShadow: `0 12px 32px rgba(0,0,0,0.45), 0 0 0 1px ${accent}33`,
@@ -464,10 +467,9 @@ export default function DashboardView({ business }: { business: Business }) {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="relative overflow-hidden rounded-3xl p-6"
           style={{
-            background:
-              'linear-gradient(127deg, rgba(6, 11, 40, 0.94) 28.26%, rgba(10, 14, 35, 0.49) 91.2%)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+            background: 'linear-gradient(127deg, rgba(6, 11, 40, 0.92) 28%, rgba(8, 16, 45, 0.8) 91%)',
+            border: 'none',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 0 60px rgba(0,200,255,0.04)',
           }}
         >
           {/* Cyan ambient glow */}
@@ -627,7 +629,7 @@ export default function DashboardView({ business }: { business: Business }) {
           {/* Dark inner chart panel */}
           <div
             className="rounded-2xl mx-3 mt-3"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: '8px 4px 4px' }}
+            style={{ background: 'rgba(255,255,255,0.03)', padding: '8px 4px 4px' }}
           >
             <ResponsiveContainer width="100%" height={180}>
               <BarChart
@@ -683,10 +685,10 @@ export default function DashboardView({ business }: { business: Business }) {
           {/* Mini-stats row */}
           <div className="grid grid-cols-4 gap-3 px-5 py-4">
             {[
-              { label: 'Callers',  value: kpis.uniqueCallers.toLocaleString(), Icon: IconUsers       },
-              { label: 'Calls',    value: kpis.totalCalls.toLocaleString(),    Icon: IconPhone       },
-              { label: 'Resolved', value: `${kpis.positivePercent}%`,          Icon: IconCheckCircle },
-              { label: 'Intents',  value: intentCounts.length.toString(),      Icon: IconBarChart    },
+              { label: 'Callers',  value: kpis.uniqueCallers.toLocaleString(), Icon: IconWallet  },
+              { label: 'Calls',    value: kpis.totalCalls.toLocaleString(),    Icon: IconRocket  },
+              { label: 'Resolved', value: `${kpis.positivePercent}%`,          Icon: IconCart    },
+              { label: 'Intents',  value: intentCounts.length.toString(),      Icon: IconWrench  },
             ].map((s, i) => (
               <motion.div
                 key={s.label}
@@ -818,7 +820,7 @@ export default function DashboardView({ business }: { business: Business }) {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 + i * 0.07 }}
                       className="flex items-start gap-3 rounded-xl p-3"
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                      style={{ background: 'rgba(255,255,255,0.03)' }}
                     >
                       <span className="mt-0.5 flex h-2 w-2 shrink-0 rounded-full" style={{ background: call.escalated ? '#f6d365' : '#f5576c', boxShadow: `0 0 8px ${call.escalated ? '#f6d365' : '#f5576c'}` }} />
                       <div className="min-w-0 flex-1">

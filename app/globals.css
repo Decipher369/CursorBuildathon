@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0f2a;
+  --background: #070b24;
   --foreground: #ffffff;
 }
 
@@ -13,23 +13,21 @@
 }
 
 html, body {
-  background: #0b0f2a;
+  background: #070b24;
   color: var(--foreground);
   min-height: 100vh;
 }
 
-/* Animated gradient mesh background */
+/* Gradient mesh background */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(94, 84, 215, 0.35) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 85% 30%, rgba(0, 212, 255, 0.25) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(186, 79, 255, 0.22) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 100% 80%, rgba(255, 51, 153, 0.18) 0%, transparent 55%),
-    linear-gradient(180deg, #0a0d2e 0%, #0b0f2a 50%, #060920 100%);
+    radial-gradient(ellipse 60% 40% at 5%  0%,   rgba(72, 52, 212, 0.55) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 50% at 95% 20%,  rgba(88, 44, 255, 0.28) 0%, transparent 55%),
+    linear-gradient(175deg, #090d28 0%, #070b22 50%, #060920 100%);
   pointer-events: none;
 }
 
@@ -62,16 +60,16 @@ body::before {
 
 /* Glassmorphism */
 .glass {
-  background: linear-gradient(127.09deg, rgba(6, 11, 40, 0.74) 19.41%, rgba(10, 14, 35, 0.71) 76.65%);
+  background: linear-gradient(127.09deg, rgba(6, 11, 40, 0.82) 19.41%, rgba(10, 14, 35, 0.75) 76.65%);
   backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
   border-radius: 20px;
 }
 
 .glass-light {
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
 }
 
 /* Gradient text */
@@ -89,28 +87,31 @@ body::before {
   background-clip: text;
 }
 
-/* Premium card with animated glow border */
+/* Premium card — dark navy base with subtle cyan glow */
 .card-premium {
   position: relative;
-  background: linear-gradient(127.09deg, rgba(6, 11, 40, 0.74) 19.41%, rgba(10, 14, 35, 0.71) 76.65%);
+  background: linear-gradient(127.09deg, rgba(6, 11, 40, 0.82) 19.41%, rgba(10, 14, 35, 0.75) 76.65%);
   backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
   border-radius: 20px;
   overflow: hidden;
 }
 
-.card-premium::before {
+/* Cyan radial glow at top-right corner */
+.card-premium::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(79, 172, 254, 0.3), transparent 40%, transparent 60%, rgba(186, 79, 255, 0.15));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  top: -30%;
+  right: -20%;
+  width: 60%;
+  height: 80%;
+  background: radial-gradient(circle, rgba(0, 200, 255, 0.1) 0%, transparent 70%);
   pointer-events: none;
+  border-radius: 50%;
 }
+
+/* No border overlay */
+.card-premium::before { display: none; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -147,3 +148,10 @@ body::before {
 }
 
 .spin-slow { animation: spin-slow 12s linear infinite; }
+
+/* Cyan bubble drift */
+@keyframes wave-drift {
+  0%,100% { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+  33%      { transform: translate(-44%, -55%) scale(1.08); opacity: 0.85; }
+  66%      { transform: translate(-56%, -46%) scale(0.94); opacity: 0.9; }
+}
