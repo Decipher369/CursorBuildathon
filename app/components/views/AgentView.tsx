@@ -1,14 +1,23 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import type { Business } from '@/lib/business-types';
 import { parseFaqs, serializeFaqs, type FaqItem } from '@/lib/faqs';
+import { IconAgent, IconAlert, IconCheckCircle } from '../icons';
 
-const inputCls =
-  'w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:border-teal-500/50 focus:outline-none focus:ring-1 focus:ring-teal-500/50 transition-colors';
+const FIELD_BASE =
+  'w-full rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 transition-all duration-200 focus:outline-none';
 
-const labelCls = 'mb-1.5 block text-xs font-medium text-slate-400';
+const FIELD_STYLE: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
+};
+
+const LABEL_CLASS =
+  'mb-1.5 block text-[11px] font-semibold uppercase tracking-widest';
+
+const LABEL_STYLE: React.CSSProperties = { color: 'rgba(255,255,255,0.55)' };
 
 export default function AgentView({
   business,
@@ -17,14 +26,19 @@ export default function AgentView({
   business: Business;
   onSaved: (updated: Business) => void;
 }) {
-  const [agentName, setAgentName] = useState(business.agent_name ?? 'CallSense Agent');
+  const [agentName, setAgentName] = useState(
+    business.agent_name ?? 'CallSense Agent',
+  );
   const [businessName, setBusinessName] = useState(business.name);
   const [persona, setPersona] = useState(
-    business.persona ?? `You are a warm, professional receptionist for ${business.name}.`,
+    business.persona ??
+      `You are a warm, professional receptionist for ${business.name}.`,
   );
   const [language, setLanguage] = useState(business.language ?? 'en');
   const [faqs, setFaqs] = useState<FaqItem[]>(() => parseFaqs(business.faqs));
-  const [escalationPhone, setEscalationPhone] = useState(business.escalation_phone ?? '');
+  const [escalationPhone, setEscalationPhone] = useState(
+    business.escalation_phone ?? '',
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -67,7 +81,8 @@ export default function AgentView({
       let data = await res.json();
 
       if (!res.ok && data.message?.includes('agent_name')) {
-        const { agent_name: _a, persona: _p, escalation_phone: _e, ...fallback } = payload;
+        const { agent_name: _a, persona: _p, escalation_phone: _e, ...fallback } =
+          payload;
         res = await fetch(`/api/businesses/${business.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -79,7 +94,6 @@ export default function AgentView({
       if (!res.ok) throw new Error(data.message || 'Failed to save');
       onSaved(data);
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to save');
     } finally {
@@ -87,194 +101,249 @@ export default function AgentView({
     }
   }
 
-  const fieldDelay = (i: number) => ({ delay: 0.05 + i * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] });
-
   return (
-    <div className="min-h-full bg-slate-950 p-4 sm:p-6 lg:p-8">
-      <motion.header
-        initial={{ opacity: 0, y: -12 }}
+    <div className="px-2 pt-6 pb-8 text-white">
+      {/* Header card */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="mb-6"
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="card-premium relative mb-6 flex items-center gap-4 overflow-hidden p-6"
       >
-        <h1 className="text-2xl font-bold tracking-tight text-white">My Agent</h1>
-        <p className="mt-0.5 text-sm text-slate-400">Configure how your AI receptionist answers calls.</p>
-      </motion.header>
-
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
-          >
-            {error}
-          </motion.div>
-        )}
-        {success && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4 rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm text-teal-400"
-          >
-            ✓ Agent settings saved successfully.
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <form onSubmit={handleSave} className="max-w-2xl space-y-5">
-        {/* Agent identity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={fieldDelay(0)}
-          className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 backdrop-blur-sm"
+        <div
+          className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(79,172,254,0.18) 0%, transparent 70%)',
+            filter: 'blur(20px)',
+          }}
+        />
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+          style={{
+            background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
+            boxShadow: '0 8px 24px rgba(79,172,254,0.45)',
+          }}
         >
-          <h2 className="mb-4 text-sm font-semibold text-slate-300">Agent Identity</h2>
-          <div className="space-y-4">
-            <div>
-              <label className={labelCls}>Agent Name</label>
-              <input className={inputCls} value={agentName} onChange={(e) => setAgentName(e.target.value)} required />
-            </div>
-            <div>
-              <label className={labelCls}>Business Name</label>
-              <input className={inputCls} value={businessName} onChange={(e) => setBusinessName(e.target.value)} required />
-            </div>
-            <div>
-              <label className={labelCls}>Persona</label>
-              <textarea
-                className={`${inputCls} h-28 resize-none`}
-                value={persona}
-                onChange={(e) => setPersona(e.target.value)}
-                placeholder="Describe how the agent should behave…"
-              />
-            </div>
-          </div>
+          <IconAgent className="h-6 w-6 text-white" />
+        </div>
+        <div className="relative">
+          <h1 className="text-2xl font-bold tracking-tight text-white" style={{ letterSpacing: '-0.02em' }}>
+            My Agent
+          </h1>
+          <p className="mt-0.5 text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            Configure how your AI receptionist answers calls.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Status banners */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm"
+          style={{
+            background: 'rgba(245,87,108,0.12)',
+            border: '1px solid rgba(245,87,108,0.3)',
+            color: '#f5576c',
+          }}
+        >
+          <IconAlert className="h-4 w-4" />
+          <span>{error}</span>
         </motion.div>
-
-        {/* Language + escalation */}
+      )}
+      {success && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={fieldDelay(1)}
-          className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 backdrop-blur-sm"
+          className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm"
+          style={{
+            background: 'rgba(67,233,123,0.12)',
+            border: '1px solid rgba(67,233,123,0.3)',
+            color: '#43e97b',
+          }}
         >
-          <h2 className="mb-4 text-sm font-semibold text-slate-300">Language & Escalation</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className={labelCls}>Language</label>
-              <select
-                className={`${inputCls} appearance-none`}
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-              >
-                <option value="en">English</option>
-                <option value="zh">Chinese</option>
-                <option value="ms">Malay</option>
-                <option value="ta">Tamil</option>
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Escalation Phone</label>
-              <input
-                className={`${inputCls} font-mono`}
-                value={escalationPhone}
-                onChange={(e) => setEscalationPhone(e.target.value)}
-                placeholder="+6591234567"
-              />
-            </div>
-          </div>
+          <IconCheckCircle className="h-4 w-4" />
+          <span>Agent settings saved.</span>
         </motion.div>
+      )}
 
-        {/* FAQs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={fieldDelay(2)}
-          className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 backdrop-blur-sm"
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-300">FAQs</h2>
+      <motion.form
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+        onSubmit={handleSave}
+        className="card-premium max-w-3xl space-y-5 p-7"
+      >
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Agent Name
+            </label>
+            <input
+              className={FIELD_BASE}
+              style={FIELD_STYLE}
+              value={agentName}
+              onChange={(e) => setAgentName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Business Name
+            </label>
+            <input
+              className={FIELD_BASE}
+              style={FIELD_STYLE}
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className={LABEL_CLASS} style={LABEL_STYLE}>
+            Persona
+          </label>
+          <textarea
+            className={`${FIELD_BASE} h-32 resize-none leading-relaxed`}
+            style={FIELD_STYLE}
+            value={persona}
+            onChange={(e) => setPersona(e.target.value)}
+          />
+          <p className="mt-1.5 text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            How your agent should sound — tone, role, attitude.
+          </p>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Language
+            </label>
+            <select
+              className={FIELD_BASE}
+              style={{
+                ...FIELD_STYLE,
+                appearance: 'none',
+                backgroundImage:
+                  'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23ffffff80\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'6 9 12 15 18 9\'/></svg>")',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center',
+                paddingRight: '36px',
+              }}
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              <option value="en" style={{ background: '#0d1440' }}>English</option>
+              <option value="zh" style={{ background: '#0d1440' }}>Chinese</option>
+              <option value="ms" style={{ background: '#0d1440' }}>Malay</option>
+              <option value="ta" style={{ background: '#0d1440' }}>Tamil</option>
+            </select>
+          </div>
+
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Escalation Phone
+            </label>
+            <input
+              className={`${FIELD_BASE} font-mono`}
+              style={FIELD_STYLE}
+              value={escalationPhone}
+              onChange={(e) => setEscalationPhone(e.target.value)}
+              placeholder="+6591234567"
+            />
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-2.5 flex items-center justify-between">
+            <label className={LABEL_CLASS + ' mb-0'} style={LABEL_STYLE}>
+              FAQs
+            </label>
             <button
               type="button"
               onClick={addFaq}
-              className="rounded-lg bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-400 ring-1 ring-teal-500/20 hover:bg-teal-500/20 transition-colors"
+              className="rounded-lg px-3 py-1 text-xs font-semibold transition-all hover:scale-[1.03]"
+              style={{
+                background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
+                color: '#fff',
+                boxShadow: '0 4px 12px rgba(79,172,254,0.35)',
+              }}
             >
               + Add FAQ
             </button>
           </div>
-          <AnimatePresence initial={false}>
-            {faqs.length === 0 && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="py-4 text-center text-xs text-slate-600"
-              >
-                No FAQs yet — add one above.
-              </motion.p>
-            )}
+          <div className="space-y-3">
             {faqs.map((faq, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mb-3 overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.03] p-3"
+                className="rounded-2xl p-4"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
               >
                 <input
-                  className={`${inputCls} mb-2`}
+                  className={`${FIELD_BASE} mb-2`}
+                  style={FIELD_STYLE}
                   placeholder="Question"
                   value={faq.question}
                   onChange={(e) => updateFaq(index, 'question', e.target.value)}
                 />
                 <textarea
-                  className={`${inputCls} resize-none`}
+                  className={`${FIELD_BASE} h-20 resize-none`}
+                  style={FIELD_STYLE}
                   placeholder="Answer"
                   rows={2}
                   value={faq.answer}
                   onChange={(e) => updateFaq(index, 'answer', e.target.value)}
                 />
-                <button
-                  type="button"
-                  onClick={() => removeFaq(index)}
-                  className="mt-2 text-xs text-red-400 hover:text-red-300 transition-colors"
-                >
-                  Remove
-                </button>
-              </motion.div>
+                {faqs.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeFaq(index)}
+                    className="mt-2 text-[11px] font-medium transition-colors hover:underline"
+                    style={{ color: '#f5576c' }}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             ))}
-          </AnimatePresence>
-        </motion.div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={fieldDelay(3)}
-        >
-          <motion.button
+        <div className="flex items-center gap-3 pt-2">
+          <button
             type="submit"
             disabled={saving}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full rounded-xl bg-teal-500/20 py-3 text-sm font-semibold text-teal-300 ring-1 ring-teal-500/40 hover:bg-teal-500/30 disabled:opacity-40 transition-colors sm:w-auto sm:px-8"
+            className="rounded-xl px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-all hover:scale-[1.02] disabled:opacity-50"
+            style={{
+              background: 'linear-gradient(310deg, #4facfe 0%, #00f2fe 100%)',
+              boxShadow: '0 8px 24px rgba(79,172,254,0.4)',
+            }}
           >
-            {saving ? (
-              <span className="flex items-center justify-center gap-2">
-                <motion.span
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block h-3.5 w-3.5 rounded-full border-2 border-teal-400 border-t-transparent"
-                />
-                Saving…
-              </span>
-            ) : (
-              'Save Agent Settings'
-            )}
-          </motion.button>
-        </motion.div>
-      </form>
+            {saving ? 'Saving…' : 'Save Changes'}
+          </button>
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Updates apply to new calls instantly.
+          </p>
+        </div>
+      </motion.form>
+
+      {/* Focus ring style for inputs */}
+      <style jsx global>{`
+        .card-premium input:focus,
+        .card-premium textarea:focus,
+        .card-premium select:focus {
+          border-color: rgba(79, 172, 254, 0.6) !important;
+          box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.18);
+          background: rgba(255, 255, 255, 0.06) !important;
+        }
+      `}</style>
     </div>
   );
 }

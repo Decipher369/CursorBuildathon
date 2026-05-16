@@ -1,39 +1,8 @@
-import axios from 'axios';
 import twilio from 'twilio';
-import { transcribeAudio, analyzeSentiment } from '@/lib/valsea';
-import { uploadCallAudio } from '@/lib/audio-storage';
-import { handleProcessCall } from '@/lib/process-call-handler';
 import { getBaseUrl } from '@/lib/config';
 import { twimlError, twimlResponse } from '@/lib/twiml-error';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
-
-function buildLoopTwiml(replyText, replyAudioUrl, actionUrl) {
-  const VoiceResponse = twilio.twiml.VoiceResponse;
-  const twiml = new VoiceResponse();
-
-  if (replyAudioUrl) {
-    twiml.play(replyAudioUrl);
-  } else if (replyText) {
-    twiml.say({ voice: 'alice' }, String(replyText).slice(0, 500));
-  }
-
-  // Record the next turn — loop back to this route
-  twiml.record({
-    maxLength: 30,
-    action: actionUrl,
-    method: 'POST',
-    playBeep: true,
-    trim: 'trim-silence',
-    timeout: 10,
-  });
-
-  // Fallthrough if nothing recorded after timeout — treat as silence
-  twiml.redirect({ method: 'POST' }, `${actionUrl}&silence=1`);
-
-  return twiml.toString();
-}
 
 function buildSilenceWarningTwiml(actionUrl) {
   const VoiceResponse = twilio.twiml.VoiceResponse;
@@ -41,7 +10,7 @@ function buildSilenceWarningTwiml(actionUrl) {
 
   twiml.say(
     { voice: 'alice' },
-    'Are you still there? I will end this call in 10 seconds if I don\'t hear from you.',
+    "Are you still there? I will end this call in 10 seconds if I don't hear from you.",
   );
   twiml.pause({ length: 2 });
 
@@ -54,7 +23,6 @@ function buildSilenceWarningTwiml(actionUrl) {
     timeout: 8,
   });
 
-  // Still nothing — countdown and hang up
   twiml.say({ voice: 'alice' }, '10. 9. 8. 7. 6. 5. 4. 3. 2. 1. Thank you for calling. Goodbye.');
   twiml.hangup();
 
@@ -64,7 +32,7 @@ function buildSilenceWarningTwiml(actionUrl) {
 export async function POST(request) {
   try {
     const formData = await request.formData();
-    const recordingUrl = formData.get('RecordingUrl');
+    const recordingSid = formData.get('RecordingSid');
     const from = formData.get('From');
     const recordingDuration = parseInt(formData.get('RecordingDuration') ?? '0', 10);
 
@@ -80,44 +48,22 @@ export async function POST(request) {
     const sidParam = call_sid ? `&call_sid=${encodeURIComponent(call_sid)}` : '';
     const actionUrl = `${baseUrl}/api/twilio/process?business_id=${encodeURIComponent(business_id)}${sidParam}`;
 
-    // No recording or silence redirect → warn the caller
-    if (silenceFlag || !recordingUrl || recordingDuration < 1) {
+    // Silence or missing recording → warn the caller and record again
+    if (silenceFlag || !recordingSid || recordingDuration < 1) {
       return twimlResponse(buildSilenceWarningTwiml(actionUrl));
     }
 
-    const wavUrl = recordingUrl.endsWith('.wav') ? recordingUrl : `${recordingUrl}.wav`;
-    const audioResponse = await axios.get(wavUrl, {
-      responseType: 'arraybuffer',
-      auth: {
-        username: process.env.TWILIO_ACCOUNT_SID,
-        password: process.env.TWILIO_AUTH_TOKEN,
-      },
-    });
+    // Respond to Twilio immediately (< 1 second) to avoid the 15-second timeout.
+    // Redirect to the async route which does all the heavy processing.
+    const asyncParams = new URLSearchParams({ business_id, recording_sid: recordingSid, from: String(from) });
+    if (call_sid) asyncParams.set('call_sid', call_sid);
 
-    const audioBuffer = Buffer.from(audioResponse.data);
-    const transcript = await transcribeAudio(audioBuffer);
-    const { score: sentiment_score, label: sentiment_label } =
-      await analyzeSentiment(transcript);
+    const VoiceResponse = twilio.twiml.VoiceResponse;
+    const twiml = new VoiceResponse();
+    twiml.say({ voice: 'alice' }, 'Please hold while I process your request.');
+    twiml.redirect({ method: 'POST' }, `${baseUrl}/api/twilio/process-async?${asyncParams}`);
 
-    const { audio_base64, response: responseText } = await handleProcessCall({
-      business_id,
-      phone_number: String(from),
-      transcript,
-      sentiment_score,
-      sentiment_label,
-      call_sid,
-    });
-
-    let replyAudioUrl = null;
-    if (audio_base64) {
-      try {
-        replyAudioUrl = await uploadCallAudio(audio_base64);
-      } catch {
-        // Blob upload failed — fall back to <Say>
-      }
-    }
-
-    return twimlResponse(buildLoopTwiml(responseText, replyAudioUrl, actionUrl));
+    return twimlResponse(twiml.toString());
   } catch (err) {
     return twimlResponse(
       twimlError(err.message || 'Sorry, we could not process your call.'),

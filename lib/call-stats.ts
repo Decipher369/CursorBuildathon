@@ -25,7 +25,13 @@ export type CallKpis = {
   returningCallers: number;
 };
 
-export type DayCount = { date: string; label: string; count: number };
+export type DayCount = {
+  date: string;
+  label: string;
+  shortLabel: string;
+  count: number;
+  positive: number;
+};
 export type IntentCount = { intent: string; count: number };
 export type SentimentSlice = { name: string; value: number; fill: string };
 
@@ -91,10 +97,13 @@ export function computeCallsByDay(calls: CallRow[], days = 7): DayCount[] {
     d.setDate(d.getDate() - i);
     const key = d.toISOString().slice(0, 10);
     const label = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-    const count = calls.filter(
+    const shortLabel = d.toLocaleDateString(undefined, { weekday: 'short' });
+    const sameDayCalls = calls.filter(
       (c) => startOfDay(new Date(c.created_at)).getTime() === d.getTime(),
-    ).length;
-    result.push({ date: key, label, count });
+    );
+    const count = sameDayCalls.length;
+    const positive = sameDayCalls.filter((c) => c.sentiment_label === 'positive').length;
+    result.push({ date: key, label, shortLabel, count, positive });
   }
   return result;
 }

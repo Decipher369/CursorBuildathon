@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CallRow } from '@/lib/call-stats';
 import { maskPhone } from '@/lib/call-stats';
 import CallAudioListenButton from '../CallAudioListenButton';
@@ -8,6 +8,16 @@ import { sentimentClass } from './sentiment-utils';
 
 export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
   const [selected, setSelected] = useState<CallRow | null>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selected) return;
+    backdropRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selected]);
+
   const recent = [...calls].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   );
@@ -19,7 +29,7 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
         {recent.length === 0 ? (
           <p className="text-sm text-zinc-500">
             No calls yet. Use{' '}
-            <a href="/demo" className="text-teal-600 underline dark:text-teal-400">
+            <a href="/admin" className="text-teal-600 underline dark:text-teal-400">
               Test agent
             </a>{' '}
             to simulate one.
@@ -80,10 +90,11 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
 
       {selected && (
         <div
+          ref={backdropRef}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           onClick={() => setSelected(null)}
-          onKeyDown={(e) => e.key === 'Escape' && setSelected(null)}
           role="presentation"
+          tabIndex={-1}
         >
           <div
             className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900"
@@ -110,23 +121,23 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
               <span
                 className={`rounded-full px-2.5 py-0.5 text-xs ${sentimentClass(selected.sentiment_label)}`}
               >
-                {selected.sentiment_label}
+                {selected.sentiment_label ?? '—'}
               </span>
               <span className="rounded-full bg-zinc-500/15 px-2.5 py-0.5 text-xs">
-                {selected.intent}
+                {selected.intent ?? '—'}
               </span>
             </div>
             <div className="space-y-3 text-sm">
               <div>
                 <p className="mb-1 text-xs font-medium text-zinc-500">Caller said</p>
                 <p className="rounded-lg bg-zinc-50 p-3 dark:bg-zinc-800">
-                  {selected.transcript}
+                  {selected.transcript ?? <span className="italic text-zinc-400">No transcript</span>}
                 </p>
               </div>
               <div>
                 <p className="mb-1 text-xs font-medium text-zinc-500">Agent response</p>
                 <p className="rounded-lg bg-teal-50 p-3 dark:bg-teal-950/40">
-                  {selected.agent_response}
+                  {selected.agent_response ?? <span className="italic text-zinc-400">No response</span>}
                 </p>
                 <div className="mt-2">
                   <CallAudioListenButton audio_base64={selected.audio_base64} />
