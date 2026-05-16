@@ -1,8 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import type { Business } from '@/lib/business-types';
 import { parseFaqs, serializeFaqs, type FaqItem } from '@/lib/faqs';
+import { IconAgent, IconAlert, IconCheckCircle } from '../icons';
+
+const FIELD_BASE =
+  'w-full rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 transition-all duration-200 focus:outline-none';
+
+const FIELD_STYLE: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
+};
+
+const LABEL_CLASS =
+  'mb-1.5 block text-[11px] font-semibold uppercase tracking-widest';
+
+const LABEL_STYLE: React.CSSProperties = { color: 'rgba(255,255,255,0.55)' };
 
 export default function AgentView({
   business,
@@ -87,89 +102,176 @@ export default function AgentView({
   }
 
   return (
-    <div className="p-8">
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-          My Agent
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Configure how your AI receptionist answers calls.
-        </p>
-      </header>
-
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {error}
+    <div className="px-2 pt-6 pb-8 text-white">
+      {/* Header card */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="card-premium relative mb-6 flex items-center gap-4 overflow-hidden p-6"
+      >
+        <div
+          className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(79,172,254,0.18) 0%, transparent 70%)',
+            filter: 'blur(20px)',
+          }}
+        />
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+          style={{
+            background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
+            boxShadow: '0 8px 24px rgba(79,172,254,0.45)',
+          }}
+        >
+          <IconAgent className="h-6 w-6 text-white" />
         </div>
+        <div className="relative">
+          <h1 className="text-2xl font-bold tracking-tight text-white" style={{ letterSpacing: '-0.02em' }}>
+            My Agent
+          </h1>
+          <p className="mt-0.5 text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            Configure how your AI receptionist answers calls.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Status banners */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm"
+          style={{
+            background: 'rgba(245,87,108,0.12)',
+            border: '1px solid rgba(245,87,108,0.3)',
+            color: '#f5576c',
+          }}
+        >
+          <IconAlert className="h-4 w-4" />
+          <span>{error}</span>
+        </motion.div>
       )}
       {success && (
-        <div className="mb-4 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-800">
-          Agent settings saved.
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm"
+          style={{
+            background: 'rgba(67,233,123,0.12)',
+            border: '1px solid rgba(67,233,123,0.3)',
+            color: '#43e97b',
+          }}
+        >
+          <IconCheckCircle className="h-4 w-4" />
+          <span>Agent settings saved.</span>
+        </motion.div>
       )}
 
-      <form
+      <motion.form
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
         onSubmit={handleSave}
-        className="max-w-2xl space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+        className="card-premium max-w-3xl space-y-5 p-7"
       >
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Agent Name
-          </label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={agentName}
-            onChange={(e) => setAgentName(e.target.value)}
-            required
-          />
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Agent Name
+            </label>
+            <input
+              className={FIELD_BASE}
+              style={FIELD_STYLE}
+              value={agentName}
+              onChange={(e) => setAgentName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Business Name
+            </label>
+            <input
+              className={FIELD_BASE}
+              style={FIELD_STYLE}
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              required
+            />
+          </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Business Name
-          </label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
+          <label className={LABEL_CLASS} style={LABEL_STYLE}>
             Persona
           </label>
           <textarea
-            className="h-28 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className={`${FIELD_BASE} h-32 resize-none leading-relaxed`}
+            style={FIELD_STYLE}
             value={persona}
             onChange={(e) => setPersona(e.target.value)}
           />
+          <p className="mt-1.5 text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            How your agent should sound — tone, role, attitude.
+          </p>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Language
+            </label>
+            <select
+              className={FIELD_BASE}
+              style={{
+                ...FIELD_STYLE,
+                appearance: 'none',
+                backgroundImage:
+                  'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23ffffff80\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'6 9 12 15 18 9\'/></svg>")',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center',
+                paddingRight: '36px',
+              }}
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              <option value="en" style={{ background: '#0d1440' }}>English</option>
+              <option value="zh" style={{ background: '#0d1440' }}>Chinese</option>
+              <option value="ms" style={{ background: '#0d1440' }}>Malay</option>
+              <option value="ta" style={{ background: '#0d1440' }}>Tamil</option>
+            </select>
+          </div>
+
+          <div>
+            <label className={LABEL_CLASS} style={LABEL_STYLE}>
+              Escalation Phone
+            </label>
+            <input
+              className={`${FIELD_BASE} font-mono`}
+              style={FIELD_STYLE}
+              value={escalationPhone}
+              onChange={(e) => setEscalationPhone(e.target.value)}
+              placeholder="+6591234567"
+            />
+          </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Language
-          </label>
-          <select
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-          >
-            <option value="en">English</option>
-            <option value="zh">Chinese</option>
-            <option value="ms">Malay</option>
-            <option value="ta">Tamil</option>
-          </select>
-        </div>
-
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="text-xs font-medium text-slate-500">FAQs</label>
+          <div className="mb-2.5 flex items-center justify-between">
+            <label className={LABEL_CLASS + ' mb-0'} style={LABEL_STYLE}>
+              FAQs
+            </label>
             <button
               type="button"
               onClick={addFaq}
-              className="text-xs font-medium text-teal-600 hover:text-teal-700"
+              className="rounded-lg px-3 py-1 text-xs font-semibold transition-all hover:scale-[1.03]"
+              style={{
+                background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
+                color: '#fff',
+                boxShadow: '0 4px 12px rgba(79,172,254,0.35)',
+              }}
             >
               + Add FAQ
             </button>
@@ -178,16 +280,22 @@ export default function AgentView({
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="rounded-lg border border-slate-100 bg-slate-50/50 p-3"
+                className="rounded-2xl p-4"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
               >
                 <input
-                  className="mb-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                  className={`${FIELD_BASE} mb-2`}
+                  style={FIELD_STYLE}
                   placeholder="Question"
                   value={faq.question}
                   onChange={(e) => updateFaq(index, 'question', e.target.value)}
                 />
                 <textarea
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                  className={`${FIELD_BASE} h-20 resize-none`}
+                  style={FIELD_STYLE}
                   placeholder="Answer"
                   rows={2}
                   value={faq.answer}
@@ -197,7 +305,8 @@ export default function AgentView({
                   <button
                     type="button"
                     onClick={() => removeFaq(index)}
-                    className="mt-2 text-xs text-red-600 hover:underline"
+                    className="mt-2 text-[11px] font-medium transition-colors hover:underline"
+                    style={{ color: '#f5576c' }}
                   >
                     Remove
                   </button>
@@ -207,26 +316,34 @@ export default function AgentView({
           </div>
         </div>
 
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Escalation Phone
-          </label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={escalationPhone}
-            onChange={(e) => setEscalationPhone(e.target.value)}
-            placeholder="+6591234567"
-          />
+        <div className="flex items-center gap-3 pt-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="rounded-xl px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-all hover:scale-[1.02] disabled:opacity-50"
+            style={{
+              background: 'linear-gradient(310deg, #4facfe 0%, #00f2fe 100%)',
+              boxShadow: '0 8px 24px rgba(79,172,254,0.4)',
+            }}
+          >
+            {saving ? 'Saving…' : 'Save Changes'}
+          </button>
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Updates apply to new calls instantly.
+          </p>
         </div>
+      </motion.form>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
-        >
-          {saving ? 'Saving…' : 'Save'}
-        </button>
-      </form>
+      {/* Focus ring style for inputs */}
+      <style jsx global>{`
+        .card-premium input:focus,
+        .card-premium textarea:focus,
+        .card-premium select:focus {
+          border-color: rgba(79, 172, 254, 0.6) !important;
+          box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.18);
+          background: rgba(255, 255, 255, 0.06) !important;
+        }
+      `}</style>
     </div>
   );
 }
