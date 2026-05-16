@@ -1,9 +1,12 @@
 import axios from 'axios';
 import twilio from 'twilio';
 import { transcribeAudio, analyzeSentiment } from '@/lib/valsea';
-import { getBaseUrl } from '@/lib/config';
 import { uploadCallAudio } from '@/lib/audio-storage';
+import { handleProcessCall } from '@/lib/process-call-handler';
 import { twimlError, twimlResponse } from '@/lib/twiml-error';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export async function POST(request) {
   try {
@@ -14,8 +17,13 @@ export async function POST(request) {
     const { searchParams } = new URL(request.url);
     const business_id = searchParams.get('business_id');
 
-    if (!recordingUrl || !from) {
-      throw new Error('Missing RecordingUrl or From in Twilio webhook');
+    if (!from) {
+      throw new Error('Missing From in Twilio webhook');
+    }
+    if (!recordingUrl) {
+      return twimlResponse(
+        twimlError('We did not catch that. Please call again and speak after the tone.'),
+      );
     }
     if (!business_id) {
       throw new Error('Missing business_id query parameter');
@@ -34,26 +42,13 @@ export async function POST(request) {
     const { score: sentiment_score, label: sentiment_label } =
       await analyzeSentiment(transcript);
 
-    const baseUrl = getBaseUrl();
-    const processResponse = await axios.post(
-      `${baseUrl}/api/calls/process`,
-      {
-        business_id,
-        phone_number: from,
-        transcript,
-        sentiment_score,
-        sentiment_label,
-      },
-      { headers: { 'Content-Type': 'application/json' } },
-    );
-
-    if (processResponse.status < 200 || processResponse.status >= 300) {
-      throw new Error(
-        processResponse.data?.message || 'Call processing failed',
-      );
-    }
-
-    const { audio_base64, response: responseText } = processResponse.data;
+    const { audio_base64, response: responseText } = await handleProcessCall({
+      business_id,
+      phone_number: String(from),
+      transcript,
+      sentiment_score,
+      sentiment_label,
+    });
 
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const twiml = new VoiceResponse();

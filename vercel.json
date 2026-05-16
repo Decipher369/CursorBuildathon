@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "app/api/twilio/process/route.js": {
+      "maxDuration": 60
+    },
+    "app/api/calls/process/route.js": {
+      "maxDuration": 60
+    }
+  }
+}
