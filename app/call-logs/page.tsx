@@ -4,7 +4,7 @@ import { getAllBusinesses } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Home() {
+export default async function CallLogsPage() {
   let businesses;
   try {
     businesses = await getAllBusinesses();
@@ -16,5 +16,5 @@ export default async function Home() {
     redirect('/onboarding');
   }
 
-  return <CallSenseApp business={businesses[0]} />;
+  return <CallSenseApp business={businesses[0]} initialView="call-logs" />;
 }

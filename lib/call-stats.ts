@@ -7,6 +7,7 @@ export type CallRow = {
   intent?: string;
   agent_response?: string;
   escalated?: boolean;
+  duration_seconds?: number;
   created_at: string;
 };
 
@@ -133,4 +134,44 @@ export function computeNeedsAttention(calls: CallRow[]): CallRow[] {
 export function maskPhone(phone: string) {
   if (phone.length <= 4) return phone;
   return `${phone.slice(0, -4).replace(/\d/g, '•')}${phone.slice(-4)}`;
+}
+
+export function formatDuration(seconds?: number) {
+  const s = Math.max(0, Math.round(seconds ?? 0));
+  if (s < 60) return `0:${s.toString().padStart(2, '0')}`;
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  return `${m}:${rem.toString().padStart(2, '0')}`;
+}
+
+export function computeAvgDurationSeconds(calls: CallRow[]) {
+  const withDuration = calls.filter((c) => (c.duration_seconds ?? 0) > 0);
+  if (!withDuration.length) return 0;
+  const total = withDuration.reduce((sum, c) => sum + (c.duration_seconds ?? 0), 0);
+  return Math.round(total / withDuration.length);
+}
+
+export function callSummary(call: CallRow) {
+  const text = call.transcript?.trim() || call.agent_response?.trim() || '';
+  const snippet = text.length > 72 ? `${text.slice(0, 72)}…` : text;
+  const intent = call.intent?.trim() || 'General inquiry';
+  return snippet ? `${intent} — ${snippet}` : intent;
+}
+
+export function normalizeCallFromApi(raw: Record<string, unknown>): CallRow {
+  const customers = raw.customers as { phone_number?: string } | null | undefined;
+  return {
+    id: String(raw.id),
+    phone_number: String(
+      raw.phone_number ?? customers?.phone_number ?? 'Unknown',
+    ),
+    transcript: raw.transcript as string | undefined,
+    sentiment_label: raw.sentiment_label as string | undefined,
+    sentiment_score: raw.sentiment_score as number | undefined,
+    intent: raw.intent as string | undefined,
+    agent_response: raw.agent_response as string | undefined,
+    escalated: Boolean(raw.escalated),
+    duration_seconds: raw.duration_seconds as number | undefined,
+    created_at: String(raw.created_at),
+  };
 }

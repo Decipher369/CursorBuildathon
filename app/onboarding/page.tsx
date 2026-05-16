@@ -28,7 +28,7 @@ export default function OnboardingPage() {
         ]);
         const businesses = await bizRes.json();
         if (bizRes.ok && Array.isArray(businesses) && businesses.length > 0) {
-          router.replace('/dashboard');
+          router.replace('/');
           return;
         }
         const config = await configRes.json();
@@ -67,7 +67,7 @@ export default function OnboardingPage() {
       if (!res.ok) throw new Error(data.message || 'Failed to create business');
 
       router.refresh();
-      router.replace('/dashboard');
+      router.replace('/');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong');
     } finally {
