@@ -242,11 +242,11 @@ export async function POST(request: Request) {
     }
 
     // ── Step 7: Update history (user turn + assistant reply) ──────
-    const updatedHistory: HistoryMessage[] = [
+    const updatedHistory: HistoryMessage[] = ([
       ...history,
-      { role: 'user', content: transcript },
-      { role: 'assistant', content: openaiResult.response },
-    ].slice(-6);
+      { role: 'user' as const, content: transcript },
+      { role: 'assistant' as const, content: openaiResult.response },
+    ] as HistoryMessage[]).slice(-6);
 
     // ── Step 8: Farewell detection — only hang up on explicit bye ─
     const shouldHangup =
