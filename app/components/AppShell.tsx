@@ -1,9 +1,10 @@
 'use client';
 
 import type { AppView, Business } from '@/lib/business-types';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   IconAgent,
-  IconBarChart,
   IconCallLogs,
   IconDashboard,
   IconFlask,
@@ -25,6 +26,13 @@ const VIEW_TITLES: Record<AppView, string> = {
   settings: 'Settings',
 };
 
+const SIDEBAR_BG = 'transparent';
+const NAV_ROW_ACTIVE_BG = '#1a1f37';
+const NAV_ICON_TILE_INACTIVE = '#1a1f37';
+const NAV_ICON_ACTIVE = '#007bff';
+const NAV_ICON_INACTIVE_COLOR = '#3182ce';
+const TOPBAR_SCROLL_THRESHOLD = 8;
+
 export default function AppShell({
   business,
   activeView,
@@ -36,6 +44,20 @@ export default function AppShell({
   onNavigate: (view: AppView) => void;
   children: React.ReactNode;
 }) {
+  const mainRef = useRef<HTMLElement>(null);
+  const [topBarFloated, setTopBarFloated] = useState(false);
+
+  const onMainScroll = useCallback(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    setTopBarFloated(el.scrollTop > TOPBAR_SCROLL_THRESHOLD);
+  }, []);
+
+  useEffect(() => {
+    const el = mainRef.current;
+    setTopBarFloated(el ? el.scrollTop > TOPBAR_SCROLL_THRESHOLD : false);
+  }, [activeView]);
+
   const initials = business.name
     .split(' ')
     .map((w) => w[0])
@@ -100,16 +122,15 @@ export default function AppShell({
           position: 'sticky',
           top: 0,
           height: '100vh',
-          overflowY: 'auto',
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          background: 'transparent',
+          background: SIDEBAR_BG,
           borderRight: 'none',
-          position: 'relative' as const,
         }}
       >
         {/* Logo */}
-        <div style={{ position: 'relative', zIndex: 1, padding: '28px 24px 22px' }}>
+        <div style={{ position: 'relative', zIndex: 1, padding: '40px 24px 22px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
@@ -132,7 +153,7 @@ export default function AppShell({
         </div>
 
         {/* Nav items */}
-        <nav style={{ position: 'relative', zIndex: 1, padding: '0 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <nav style={{ position: 'relative', zIndex: 1, padding: '0 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {nav.map(({ id, label, Icon }) => {
             const active = activeView === id;
             return (
@@ -141,27 +162,30 @@ export default function AppShell({
                 type="button"
                 onClick={() => onNavigate(id)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '14px',
-                  width: '100%', padding: '11px 14px', borderRadius: '14px',
+                  display: 'flex', alignItems: 'center', gap: '12px',
+                  width: '100%', padding: '10px 12px', borderRadius: '12px',
                   border: 'none', cursor: 'pointer', textAlign: 'left',
-                  fontSize: '14px', fontWeight: active ? 700 : 500,
+                  fontSize: '14px', fontWeight: active ? 600 : 500,
                   color: '#fff',
-                  background: active ? 'rgba(255,255,255,0.09)' : 'transparent',
+                  background: active ? NAV_ROW_ACTIVE_BG : 'transparent',
                   transition: 'background 0.2s',
                 }}
               >
                 <span style={{
-                  width: '34px', height: '34px', borderRadius: '10px', flexShrink: 0,
+                  width: '36px', height: '36px', borderRadius: '12px', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: active
-                    ? 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)'
-                    : 'rgba(255,255,255,0.08)',
-                  boxShadow: active ? '0 4px 14px rgba(79,172,254,0.5)' : 'none',
-                  transition: 'all 0.2s',
+                  background: active ? NAV_ICON_ACTIVE : NAV_ICON_TILE_INACTIVE,
+                  boxShadow: 'none',
+                  transition: 'background 0.2s',
                 }}>
-                  <Icon style={{ width: '16px', height: '16px', color: active ? '#fff' : 'rgba(255,255,255,0.6)' }} />
+                  <Icon
+                    style={{
+                      width: '17px', height: '17px',
+                      color: active ? '#fff' : NAV_ICON_INACTIVE_COLOR,
+                    }}
+                  />
                 </span>
-                <span style={{ opacity: active ? 1 : 0.7 }}>{label}</span>
+                <span>{label}</span>
               </button>
             );
           })}
@@ -172,75 +196,116 @@ export default function AppShell({
           </div>
 
           {[
-            { href: '/metrics', label: 'Metrics',    Icon: IconBarChart },
-            { href: '/admin',   label: 'Test Agent', Icon: IconFlask    },
+            { href: '/admin', label: 'Test Agent', Icon: IconFlask },
           ].map(({ href, label, Icon }) => (
-            <a key={href} href={href} style={{
-              display: 'flex', alignItems: 'center', gap: '14px', padding: '11px 14px',
-              borderRadius: '14px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
-              color: 'rgba(255,255,255,0.7)', transition: 'background 0.2s',
-            }}>
-              <span style={{ width: '34px', height: '34px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.08)' }}>
-                <Icon style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.6)' }} />
+            <Link
+              key={href}
+              href={href}
+              prefetch
+              style={{
+                display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
+                borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
+                color: '#fff', background: 'transparent', transition: 'background 0.2s',
+              }}
+            >
+              <span style={{
+                width: '36px', height: '36px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                background: NAV_ICON_TILE_INACTIVE,
+              }}>
+                <Icon style={{ width: '17px', height: '17px', color: NAV_ICON_INACTIVE_COLOR }} />
               </span>
               {label}
-            </a>
+            </Link>
           ))}
         </nav>
 
-        {/* Promo card — bottom */}
+        {/* Promo card — Vision UI "Need help?" mesh gradient */}
         <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {/* Promo card — fluid blue wave, matches Vision UI reference */}
           <div style={{
-            borderRadius: '20px', padding: '18px', position: 'relative', overflow: 'hidden',
-            background: 'linear-gradient(160deg, #1a237e 0%, #283593 20%, #1565c0 45%, #0288d1 65%, #4a148c 100%)',
-            boxShadow: '0 16px 40px rgba(30,50,200,0.5)',
+            borderRadius: '18px',
+            padding: '20px 18px 18px',
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'linear-gradient(155deg, #0d1038 0%, #151b6e 22%, #1e3a8a 42%, #2563eb 58%, #312e81 78%, #1e1b4b 100%)',
+            boxShadow: '0 18px 48px rgba(15, 35, 140, 0.55)',
           }}>
-            {/* Bright liquid wave highlight — upper right */}
+            {/* Mesh blob — electric blue top-right */}
             <div style={{
-              position: 'absolute', top: '-30%', right: '-15%',
-              width: '75%', height: '75%', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(100,180,255,0.55) 0%, rgba(80,140,255,0.25) 45%, transparent 70%)',
-              filter: 'blur(18px)',
+              position: 'absolute',
+              top: '-35%',
+              right: '-28%',
+              width: '95%',
+              height: '85%',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle at 40% 40%, rgba(96,165,250,0.75) 0%, rgba(59,130,246,0.35) 38%, transparent 68%)',
+              filter: 'blur(28px)',
+              pointerEvents: 'none',
             }} />
-            {/* Secondary wave — lower left */}
+            {/* Mesh blob — deep indigo bottom */}
             <div style={{
-              position: 'absolute', bottom: '-20%', left: '-10%',
-              width: '60%', height: '60%', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(140,100,255,0.4) 0%, transparent 65%)',
-              filter: 'blur(14px)',
+              position: 'absolute',
+              bottom: '-45%',
+              left: '-20%',
+              width: '100%',
+              height: '70%',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle at 50% 30%, rgba(30,58,138,0.9) 0%, rgba(49,46,129,0.45) 45%, transparent 70%)',
+              filter: 'blur(22px)',
+              pointerEvents: 'none',
             }} />
-            {/* Mid wave streak */}
+            {/* Mesh streak — center highlight */}
             <div style={{
-              position: 'absolute', top: '30%', left: '20%',
-              width: '70%', height: '40%',
-              background: 'radial-gradient(ellipse 100% 60% at 50% 50%, rgba(160,210,255,0.2) 0%, transparent 70%)',
-              filter: 'blur(10px)',
-              transform: 'rotate(-15deg)',
+              position: 'absolute',
+              top: '18%',
+              left: '8%',
+              width: '75%',
+              height: '50%',
+              background: 'radial-gradient(ellipse 85% 70% at 50% 50%, rgba(147,197,253,0.35) 0%, transparent 72%)',
+              filter: 'blur(16px)',
+              transform: 'rotate(-12deg)',
+              pointerEvents: 'none',
+            }} />
+            {/* Purple edge wash */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(210deg, transparent 50%, rgba(76,29,149,0.22) 100%)',
+              pointerEvents: 'none',
             }} />
 
-            <div style={{ position: 'relative' }}>
-              {/* White star badge — matches reference */}
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '12px', marginBottom: '12px',
-                background: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-              }}>
-                <svg style={{ width: '20px', height: '20px', color: '#4facfe' }} viewBox="0 0 24 24" fill="currentColor">
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              {/* Star only — no white tile (blends into mesh) */}
+              <div style={{ marginBottom: '14px', lineHeight: 0 }}>
+                <svg
+                  style={{ width: '26px', height: '26px', color: '#38bdf8', filter: 'drop-shadow(0 0 14px rgba(56,189,248,0.85))' }}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden
+                >
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               </div>
-              <p style={{ color: '#fff', fontWeight: 700, fontSize: '14px', margin: '0 0 3px' }}>Need help?</p>
-              <p style={{ color: 'rgba(200,220,255,0.85)', fontSize: '11px', margin: '0 0 14px' }}>Please check our docs</p>
+              <p style={{ color: '#fff', fontWeight: 700, fontSize: '15px', letterSpacing: '-0.01em', margin: '0 0 6px' }}>Need help?</p>
+              <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: '12px', fontWeight: 500, lineHeight: 1.45, margin: '0 0 18px' }}>Please check our docs</p>
               <a
                 href="https://github.com/Decipher369/CursorBuildathon"
-                target="_blank" rel="noopener"
+                target="_blank"
+                rel="noopener"
                 style={{
-                  display: 'block', textAlign: 'center', padding: '10px 0',
-                  borderRadius: '10px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em',
-                  color: '#fff', textDecoration: 'none',
-                  background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(16px)',
+                  display: 'block',
+                  textAlign: 'center',
+                  padding: '12px 16px',
+                  borderRadius: '9999px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  color: '#fff',
+                  textDecoration: 'none',
+                  background: 'rgba(6, 10, 32, 0.55)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: 'none',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
                 }}
               >
                 DOCUMENTATION
@@ -249,31 +314,55 @@ export default function AppShell({
           </div>
 
           {/* Cyan pill button — "Upgrade to PRO" style */}
-          <a href="/admin" style={{
-            display: 'block', textAlign: 'center', padding: '12px 0',
-            borderRadius: '50px', fontSize: '13px', fontWeight: 700,
-            color: '#fff', textDecoration: 'none',
-            background: 'linear-gradient(90deg, #00d2ff 0%, #00b4d8 50%, #0096c7 100%)',
-            boxShadow: '0 8px 28px rgba(0,180,230,0.5)',
-          }}>
+          <Link
+            href="/admin"
+            prefetch
+            style={{
+              display: 'block', textAlign: 'center', padding: '12px 0',
+              borderRadius: '50px', fontSize: '13px', fontWeight: 700,
+              color: '#fff', textDecoration: 'none',
+              background: 'linear-gradient(90deg, #00d2ff 0%, #00b4d8 50%, #0096c7 100%)',
+              boxShadow: 'none',
+            }}
+          >
             TEST AGENT
-          </a>
+          </Link>
         </div>
       </aside>
 
       {/* Main content — scrolls independently, sidebar stays fixed */}
-      <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto', background: 'transparent' }}>
-        {/* Floating top bar — stays at top while content scrolls */}
-        <div style={{ position: 'sticky', top: 0, zIndex: 20, padding: '12px 16px 0' }}>
+      <main
+        ref={mainRef}
+        onScroll={onMainScroll}
+        style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto', background: 'transparent' }}
+      >
+        {/* Top bar — transparent at scroll top; glossy rounded pill when scrolled */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
+            padding: topBarFloated ? '10px 16px 0' : '0',
+            transition: 'padding 0.2s ease',
+          }}
+        >
           <div
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '10px 20px',
-              background: 'linear-gradient(135deg, rgba(6,8,24,0.75) 0%, rgba(8,13,40,0.65) 50%, rgba(12,21,80,0.6) 100%)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              borderRadius: '16px',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.05) inset',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 24px',
+              background: topBarFloated
+                ? 'linear-gradient(135deg, rgba(14, 22, 58, 0.58) 0%, rgba(12, 18, 48, 0.45) 100%)'
+                : 'transparent',
+              backdropFilter: topBarFloated ? 'blur(20px)' : 'none',
+              WebkitBackdropFilter: topBarFloated ? 'blur(20px)' : 'none',
+              borderRadius: topBarFloated ? '16px' : '0',
+              boxShadow: topBarFloated
+                ? '0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08)'
+                : 'none',
+              border: topBarFloated ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
+              transition: 'background 0.22s ease, box-shadow 0.22s ease, border-radius 0.22s ease, border-color 0.22s ease, backdrop-filter 0.22s ease',
             }}
           >
           <div>
@@ -289,7 +378,7 @@ export default function AppShell({
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {/* Search */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', width: '200px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)', width: '200px' }}>
               <svg style={{ width: '13px', height: '13px', color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
               </svg>
@@ -297,11 +386,11 @@ export default function AppShell({
             </div>
 
             {/* Sign in / profile */}
-            <button style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '7px 16px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', border: 'none', cursor: 'pointer' }}>
-              <svg style={{ width: '15px', height: '15px', color: 'rgba(255,255,255,0.7)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <button type="button" style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '7px 16px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', cursor: 'pointer' }}>
+              <svg style={{ width: '15px', height: '15px', color: 'rgba(255,255,255,0.85)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{business.name.split(' ')[0]}</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>Sign in</span>
             </button>
 
             {/* Settings */}
@@ -325,7 +414,7 @@ export default function AppShell({
         </div>{/* end sticky wrapper */}
 
         {/* Page content */}
-        <div style={{ flex: 1, padding: '24px 28px' }}>
+        <div style={{ flex: 1, padding: '20px 28px' }}>
           {children}
         </div>
       </main>

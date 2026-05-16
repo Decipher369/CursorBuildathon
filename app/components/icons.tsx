@@ -251,6 +251,26 @@ export function IconWallet(props: IconProps) {
   );
 }
 
+/** Globe / web — Vision UI "Today's Users" style */
+export function IconGlobe(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+/** Document + plus — "New Clients" style */
+export function IconFileDoc(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6M12 18v-6M9 15h6" />
+    </svg>
+  );
+}
+
 export function IconRocket(props: IconProps) {
   return (
     <svg {...base(props)}>

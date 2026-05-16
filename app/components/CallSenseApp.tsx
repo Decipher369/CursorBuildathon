@@ -1,8 +1,9 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AppView, Business } from '@/lib/business-types';
+import { APP_PREFETCH_HREFS } from '@/lib/app-prefetch';
 import AppShell from './AppShell';
 import AgentView from './views/AgentView';
 import CallLogsView from './views/CallLogsView';
@@ -46,6 +47,16 @@ export default function CallSenseApp({
     },
     [router],
   );
+
+  useEffect(() => {
+    APP_PREFETCH_HREFS.forEach((href) => {
+      try {
+        router.prefetch(href);
+      } catch {
+        /* ignore */
+      }
+    });
+  }, [router]);
 
   const onSaved = useCallback((updated: Business) => {
     setBusiness(updated);

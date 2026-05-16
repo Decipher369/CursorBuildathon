@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #03060f;
+  --background: #0c1638;
   --foreground: #ffffff;
 }
 
@@ -13,21 +13,23 @@
 }
 
 html, body {
-  background: #03060f;
+  background: #0c1638;
   color: var(--foreground);
   min-height: 100vh;
 }
 
-/* Gradient mesh background — very dark base with light blue glow */
+/* Gradient mesh — rich dark blue base; gutter beside sidebar stays visibly blue */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 55% 40% at 3%  0%,   rgba(45, 53, 197, 0.55) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 45% at 97% 15%,  rgba(50, 60, 210, 0.35) 0%, transparent 55%),
-    linear-gradient(175deg, #04071a 0%, #030510 50%, #020408 100%);
+    radial-gradient(ellipse 55% 95% at 6% 50%, rgba(37, 65, 150, 0.55) 0%, rgba(20, 40, 110, 0.22) 42%, transparent 62%),
+    radial-gradient(ellipse 70% 55% at 0% 0%, rgba(30, 58, 138, 0.75) 0%, rgba(20, 45, 120, 0.35) 38%, transparent 65%),
+    radial-gradient(ellipse 45% 38% at 0% 0%, rgba(50, 80, 190, 0.45) 0%, transparent 52%),
+    radial-gradient(ellipse 40% 45% at 97% 15%, rgba(55, 70, 200, 0.28) 0%, transparent 55%),
+    linear-gradient(165deg, #122252 0%, #0e1b48 38%, #0a1430 72%, #08102a 100%);
   pointer-events: none;
 }
 
@@ -88,15 +90,16 @@ body::before {
   background-clip: text;
 }
 
-/* Premium card — subtle diagonal blend, dark dominant */
+/* Premium card — Vision UI: flat dark slate, soft lift */
 .card-premium {
   position: relative;
-  background: linear-gradient(135deg, #060818 0%, #080d28 40%, #0c1550 75%, #101a6a 100%);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  background: rgba(12, 16, 42, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: none;
   border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
 .card-premium::before { display: none; }
