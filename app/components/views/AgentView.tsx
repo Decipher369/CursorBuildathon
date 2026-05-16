@@ -1,8 +1,14 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import type { Business } from '@/lib/business-types';
 import { parseFaqs, serializeFaqs, type FaqItem } from '@/lib/faqs';
+
+const inputCls =
+  'w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:border-teal-500/50 focus:outline-none focus:ring-1 focus:ring-teal-500/50 transition-colors';
+
+const labelCls = 'mb-1.5 block text-xs font-medium text-slate-400';
 
 export default function AgentView({
   business,
@@ -11,19 +17,14 @@ export default function AgentView({
   business: Business;
   onSaved: (updated: Business) => void;
 }) {
-  const [agentName, setAgentName] = useState(
-    business.agent_name ?? 'CallSense Agent',
-  );
+  const [agentName, setAgentName] = useState(business.agent_name ?? 'CallSense Agent');
   const [businessName, setBusinessName] = useState(business.name);
   const [persona, setPersona] = useState(
-    business.persona ??
-      `You are a warm, professional receptionist for ${business.name}.`,
+    business.persona ?? `You are a warm, professional receptionist for ${business.name}.`,
   );
   const [language, setLanguage] = useState(business.language ?? 'en');
   const [faqs, setFaqs] = useState<FaqItem[]>(() => parseFaqs(business.faqs));
-  const [escalationPhone, setEscalationPhone] = useState(
-    business.escalation_phone ?? '',
-  );
+  const [escalationPhone, setEscalationPhone] = useState(business.escalation_phone ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -66,8 +67,7 @@ export default function AgentView({
       let data = await res.json();
 
       if (!res.ok && data.message?.includes('agent_name')) {
-        const { agent_name: _a, persona: _p, escalation_phone: _e, ...fallback } =
-          payload;
+        const { agent_name: _a, persona: _p, escalation_phone: _e, ...fallback } = payload;
         res = await fetch(`/api/businesses/${business.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -79,6 +79,7 @@ export default function AgentView({
       if (!res.ok) throw new Error(data.message || 'Failed to save');
       onSaved(data);
       setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to save');
     } finally {
@@ -86,146 +87,193 @@ export default function AgentView({
     }
   }
 
+  const fieldDelay = (i: number) => ({ delay: 0.05 + i * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] });
+
   return (
-    <div className="p-8">
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-          My Agent
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Configure how your AI receptionist answers calls.
-        </p>
-      </header>
-
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="mb-4 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-800">
-          Agent settings saved.
-        </div>
-      )}
-
-      <form
-        onSubmit={handleSave}
-        className="max-w-2xl space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+    <div className="min-h-full bg-slate-950 p-4 sm:p-6 lg:p-8">
+      <motion.header
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6"
       >
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Agent Name
-          </label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={agentName}
-            onChange={(e) => setAgentName(e.target.value)}
-            required
-          />
-        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-white">My Agent</h1>
+        <p className="mt-0.5 text-sm text-slate-400">Configure how your AI receptionist answers calls.</p>
+      </motion.header>
 
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Business Name
-          </label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Persona
-          </label>
-          <textarea
-            className="h-28 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={persona}
-            onChange={(e) => setPersona(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Language
-          </label>
-          <select
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
           >
-            <option value="en">English</option>
-            <option value="zh">Chinese</option>
-            <option value="ms">Malay</option>
-            <option value="ta">Tamil</option>
-          </select>
-        </div>
+            {error}
+          </motion.div>
+        )}
+        {success && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm text-teal-400"
+          >
+            ✓ Agent settings saved successfully.
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="text-xs font-medium text-slate-500">FAQs</label>
+      <form onSubmit={handleSave} className="max-w-2xl space-y-5">
+        {/* Agent identity */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={fieldDelay(0)}
+          className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 backdrop-blur-sm"
+        >
+          <h2 className="mb-4 text-sm font-semibold text-slate-300">Agent Identity</h2>
+          <div className="space-y-4">
+            <div>
+              <label className={labelCls}>Agent Name</label>
+              <input className={inputCls} value={agentName} onChange={(e) => setAgentName(e.target.value)} required />
+            </div>
+            <div>
+              <label className={labelCls}>Business Name</label>
+              <input className={inputCls} value={businessName} onChange={(e) => setBusinessName(e.target.value)} required />
+            </div>
+            <div>
+              <label className={labelCls}>Persona</label>
+              <textarea
+                className={`${inputCls} h-28 resize-none`}
+                value={persona}
+                onChange={(e) => setPersona(e.target.value)}
+                placeholder="Describe how the agent should behave…"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Language + escalation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={fieldDelay(1)}
+          className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 backdrop-blur-sm"
+        >
+          <h2 className="mb-4 text-sm font-semibold text-slate-300">Language & Escalation</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className={labelCls}>Language</label>
+              <select
+                className={`${inputCls} appearance-none`}
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                <option value="en">English</option>
+                <option value="zh">Chinese</option>
+                <option value="ms">Malay</option>
+                <option value="ta">Tamil</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Escalation Phone</label>
+              <input
+                className={`${inputCls} font-mono`}
+                value={escalationPhone}
+                onChange={(e) => setEscalationPhone(e.target.value)}
+                placeholder="+6591234567"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* FAQs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={fieldDelay(2)}
+          className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 backdrop-blur-sm"
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-300">FAQs</h2>
             <button
               type="button"
               onClick={addFaq}
-              className="text-xs font-medium text-teal-600 hover:text-teal-700"
+              className="rounded-lg bg-teal-500/10 px-3 py-1 text-xs font-medium text-teal-400 ring-1 ring-teal-500/20 hover:bg-teal-500/20 transition-colors"
             >
               + Add FAQ
             </button>
           </div>
-          <div className="space-y-3">
+          <AnimatePresence initial={false}>
+            {faqs.length === 0 && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="py-4 text-center text-xs text-slate-600"
+              >
+                No FAQs yet — add one above.
+              </motion.p>
+            )}
             {faqs.map((faq, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="rounded-lg border border-slate-100 bg-slate-50/50 p-3"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-3 overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.03] p-3"
               >
                 <input
-                  className="mb-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                  className={`${inputCls} mb-2`}
                   placeholder="Question"
                   value={faq.question}
                   onChange={(e) => updateFaq(index, 'question', e.target.value)}
                 />
                 <textarea
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                  className={`${inputCls} resize-none`}
                   placeholder="Answer"
                   rows={2}
                   value={faq.answer}
                   onChange={(e) => updateFaq(index, 'answer', e.target.value)}
                 />
-                {faqs.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeFaq(index)}
-                    className="mt-2 text-xs text-red-600 hover:underline"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
+                <button
+                  type="button"
+                  onClick={() => removeFaq(index)}
+                  className="mt-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+                >
+                  Remove
+                </button>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </AnimatePresence>
+        </motion.div>
 
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-500">
-            Escalation Phone
-          </label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-            value={escalationPhone}
-            onChange={(e) => setEscalationPhone(e.target.value)}
-            placeholder="+6591234567"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={fieldDelay(3)}
         >
-          {saving ? 'Saving…' : 'Save'}
-        </button>
+          <motion.button
+            type="submit"
+            disabled={saving}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full rounded-xl bg-teal-500/20 py-3 text-sm font-semibold text-teal-300 ring-1 ring-teal-500/40 hover:bg-teal-500/30 disabled:opacity-40 transition-colors sm:w-auto sm:px-8"
+          >
+            {saving ? (
+              <span className="flex items-center justify-center gap-2">
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  className="inline-block h-3.5 w-3.5 rounded-full border-2 border-teal-400 border-t-transparent"
+                />
+                Saving…
+              </span>
+            ) : (
+              'Save Agent Settings'
+            )}
+          </motion.button>
+        </motion.div>
       </form>
     </div>
   );

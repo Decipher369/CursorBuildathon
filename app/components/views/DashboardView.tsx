@@ -189,7 +189,7 @@ export default function DashboardView({ business }: { business: Business }) {
       )}
 
       {/* ── KPI Grid ── */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Total Calls" value={loading ? 0 : kpis.totalCalls} icon="📞" color="#14b8a6" delay={0} />
         <StatCard label="Calls Today" value={loading ? 0 : kpis.callsToday} icon="🗓️" color="#8b5cf6" delay={0.05} />
         <StatCard label="Escalations" value={loading ? 0 : kpis.escalatedCount} icon="⚠️" color="#f59e0b" delta={kpis.escalatedCount > 0 ? `${kpis.escalatedPercent}%` : undefined} delay={0.1} />
@@ -199,7 +199,7 @@ export default function DashboardView({ business }: { business: Business }) {
       </div>
 
       {/* ── Row 2: Charts ── */}
-      <div className="mb-6 grid gap-4 xl:grid-cols-3">
+      <div className="mb-6 grid gap-4 lg:grid-cols-3">
         {/* Call Volume */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -267,7 +267,7 @@ export default function DashboardView({ business }: { business: Business }) {
       </div>
 
       {/* ── Row 3: Intents + Needs Attention ── */}
-      <div className="mb-6 grid gap-4 xl:grid-cols-2">
+      <div className="mb-6 grid gap-4 lg:grid-cols-2">
         {/* Intent Breakdown */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}

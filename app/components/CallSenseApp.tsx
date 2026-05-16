@@ -56,7 +56,7 @@ export default function CallSenseApp({
       {view === 'dashboard' && <DashboardView business={business} />}
       {view === 'call-logs' && <CallLogsView business={business} />}
       {view === 'agent' && <AgentView business={business} onSaved={onSaved} />}
-      {view === 'settings' && <SettingsView business={business} />}
+      {view === 'settings' && <SettingsView business={business} onSaved={onSaved} />}
     </AppShell>
   );
 }
