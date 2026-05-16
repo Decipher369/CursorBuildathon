@@ -476,9 +476,41 @@ export default function DashboardView({ business }: { business: Business }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="card-premium relative p-6"
+          className="relative overflow-hidden rounded-3xl p-6"
+          style={{
+            background:
+              'linear-gradient(127deg, rgba(6, 11, 40, 0.94) 28.26%, rgba(10, 14, 35, 0.49) 91.2%)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+          }}
         >
-          <div className="mb-5 flex items-start justify-between">
+          {/* Cyan ambient glow */}
+          <div
+            className="pointer-events-none absolute"
+            style={{
+              right: '-15%',
+              top: '-30%',
+              width: '60%',
+              height: '120%',
+              background:
+                'radial-gradient(circle, rgba(1, 181, 226, 0.18) 0%, rgba(1, 181, 226, 0.08) 35%, transparent 70%)',
+              filter: 'blur(20px)',
+            }}
+          />
+          <div
+            className="pointer-events-none absolute"
+            style={{
+              left: '-10%',
+              bottom: '-30%',
+              width: '50%',
+              height: '90%',
+              background:
+                'radial-gradient(circle, rgba(0, 117, 255, 0.14) 0%, transparent 65%)',
+              filter: 'blur(20px)',
+            }}
+          />
+
+          <div className="relative mb-5 flex items-start justify-between">
             <div>
               <p className="text-base font-bold text-white">Call Volume</p>
               <div className="mt-1 flex items-center gap-1.5 text-xs">
@@ -491,28 +523,133 @@ export default function DashboardView({ business }: { business: Business }) {
               </div>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={callsByDay} margin={{ top: 10, right: 12, bottom: 0, left: -18 }}>
+
+          <div className="relative">
+            <ResponsiveContainer width="100%" height={260}>
+              <AreaChart data={callsByDay} margin={{ top: 10, right: 12, bottom: 0, left: -18 }}>
+                <defs>
+                  {/* Primary cyan area — vivid, glowing */}
+                  <linearGradient id="callGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#21D4FD" stopOpacity={0.85} />
+                    <stop offset="50%" stopColor="#21D4FD" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#21D4FD" stopOpacity={0} />
+                  </linearGradient>
+                  {/* Secondary lighter cyan area */}
+                  <linearGradient id="callGrad2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#A6FFCB" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="#A6FFCB" stopOpacity={0} />
+                  </linearGradient>
+                  {/* Bright cyan strokes */}
+                  <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#21D4FD" />
+                    <stop offset="100%" stopColor="#7CF7FF" />
+                  </linearGradient>
+                  <linearGradient id="strokeGrad2" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#7CF7FF" />
+                    <stop offset="100%" stopColor="#21D4FD" />
+                  </linearGradient>
+                  {/* Glow filter for the strokes */}
+                  <filter id="lineGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <CartesianGrid
+                  strokeDasharray="4 4"
+                  stroke="rgba(255,255,255,0.07)"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="shortLabel"
+                  tick={{ fill: 'rgba(255,255,255,0.55)', fontSize: 10, fontWeight: 500 }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                  dy={6}
+                />
+                <YAxis
+                  tick={{ fill: 'rgba(255,255,255,0.55)', fontSize: 10, fontWeight: 500 }}
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                  width={32}
+                />
+
+                <Tooltip
+                  content={<ChartTooltip accent="#21D4FD" unit="calls" />}
+                  cursor={{ stroke: 'rgba(33,212,253,0.4)', strokeWidth: 1, strokeDasharray: '3 3' }}
+                />
+
+                {/* Back layer — total calls (vivid cyan) */}
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  name="Total calls"
+                  stroke="url(#strokeGrad)"
+                  strokeWidth={3.5}
+                  fill="url(#callGrad)"
+                  dot={false}
+                  activeDot={{
+                    fill: '#fff',
+                    r: 5,
+                    stroke: '#21D4FD',
+                    strokeWidth: 3,
+                    filter: 'drop-shadow(0 0 8px rgba(33,212,253,0.9))',
+                  }}
+                  isAnimationActive
+                  animationDuration={1500}
+                  filter="url(#lineGlow)"
+                />
+
+                {/* Front layer — positive resolutions (lighter cyan-mint) */}
+                <Area
+                  type="monotone"
+                  dataKey="positive"
+                  name="Positive"
+                  stroke="url(#strokeGrad2)"
+                  strokeWidth={3}
+                  fill="url(#callGrad2)"
+                  dot={false}
+                  activeDot={{
+                    fill: '#fff',
+                    r: 4,
+                    stroke: '#7CF7FF',
+                    strokeWidth: 3,
+                    filter: 'drop-shadow(0 0 6px rgba(124,247,255,0.9))',
+                  }}
+                  isAnimationActive
+                  animationDuration={1700}
+                  filter="url(#lineGlow)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        {/* Active Calls — Vision UI Active Users-style card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.6 }}
+          className="card-premium relative p-6"
+        >
+          {/* Bar chart at top — pure bars on the card, no inner panel */}
+          <ResponsiveContainer width="100%" height={170}>
+            <BarChart
+              data={callsByDay}
+              margin={{ top: 16, right: 8, bottom: 4, left: -20 }}
+              barCategoryGap="38%"
+            >
               <defs>
-                {/* Primary cyan/blue area */}
-                <linearGradient id="callGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4facfe" stopOpacity={0.55} />
-                  <stop offset="50%" stopColor="#4facfe" stopOpacity={0.18} />
-                  <stop offset="100%" stopColor="#4facfe" stopOpacity={0} />
-                </linearGradient>
-                {/* Secondary purple shadow line */}
-                <linearGradient id="callGrad2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#582CFF" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#582CFF" stopOpacity={0} />
-                </linearGradient>
-                {/* Stroke gradients */}
-                <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#4facfe" />
-                  <stop offset="100%" stopColor="#00f2fe" />
-                </linearGradient>
-                <linearGradient id="strokeGrad2" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#7B61FF" />
-                  <stop offset="100%" stopColor="#582CFF" />
+                <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#fff" stopOpacity={1} />
+                  <stop offset="80%" stopColor="#fff" stopOpacity={0.55} />
+                  <stop offset="100%" stopColor="#fff" stopOpacity={0.15} />
                 </linearGradient>
               </defs>
 
@@ -523,10 +660,11 @@ export default function DashboardView({ business }: { business: Business }) {
               />
 
               <XAxis
-                dataKey="label"
+                dataKey="shortLabel"
                 tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 500 }}
                 axisLine={false}
                 tickLine={false}
+                interval={0}
                 dy={6}
               />
               <YAxis
@@ -534,119 +672,39 @@ export default function DashboardView({ business }: { business: Business }) {
                 axisLine={false}
                 tickLine={false}
                 allowDecimals={false}
-                width={36}
+                width={28}
               />
 
               <Tooltip
-                content={<ChartTooltip accent="#4facfe" unit="calls" />}
-                cursor={{ stroke: 'rgba(79,172,254,0.35)', strokeWidth: 1, strokeDasharray: '3 3' }}
+                cursor={{ fill: 'rgba(255,255,255,0.04)', radius: 4 }}
+                content={<ChartTooltip accent="#fff" unit="calls" />}
               />
 
-              {/* Soft purple shadow (back layer) */}
-              <Area
-                type="monotone"
+              <Bar
                 dataKey="count"
-                stroke="url(#strokeGrad2)"
-                strokeWidth={2}
-                fill="url(#callGrad2)"
-                dot={false}
-                isAnimationActive
-                animationDuration={1500}
-                style={{ filter: 'blur(0.5px)' }}
+                fill="url(#barGrad)"
+                radius={[8, 8, 2, 2]}
+                animationDuration={1200}
+                style={{ filter: 'drop-shadow(0 -2px 12px rgba(255,255,255,0.18))' }}
               />
-
-              {/* Bright cyan primary (front layer) */}
-              <Area
-                type="monotone"
-                dataKey="count"
-                stroke="url(#strokeGrad)"
-                strokeWidth={3}
-                fill="url(#callGrad)"
-                dot={false}
-                activeDot={{
-                  fill: '#fff',
-                  r: 5,
-                  stroke: '#4facfe',
-                  strokeWidth: 3,
-                  filter: 'drop-shadow(0 0 6px rgba(79,172,254,0.8))',
-                }}
-                isAnimationActive
-                animationDuration={1500}
-              />
-            </AreaChart>
+            </BarChart>
           </ResponsiveContainer>
-        </motion.div>
 
-        {/* Active Calls — bar chart + mini-stats grid (Vision UI signature card) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.6 }}
-          className="card-premium relative p-6"
-        >
-          <div className="mb-1">
+          {/* Header sits BELOW the chart in Vision UI Active Users layout */}
+          <div className="mb-3 mt-4">
             <p className="text-base font-bold text-white">Active Calls</p>
             <div className="mt-1 flex items-center gap-1.5 text-xs">
               <span className="font-bold" style={{ color: '#01B574' }}>
-                (+{Math.max(intentCounts.length, 1)})
+                (+{kpis.totalCalls})
               </span>
               <span style={{ color: 'rgba(255,255,255,0.5)' }}>
-                intent categories tracked
+                than last week
               </span>
             </div>
           </div>
 
-          {intentCounts.length === 0 ? (
-            <p className="my-12 text-center text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>No data yet</p>
-          ) : (
-            <div
-              className="mt-3 rounded-2xl p-4"
-              style={{
-                background: 'linear-gradient(135deg, rgba(79,172,254,0.18) 0%, rgba(0,242,254,0.04) 100%)',
-                border: '1px solid rgba(79,172,254,0.18)',
-              }}
-            >
-              <ResponsiveContainer width="100%" height={140}>
-                <BarChart
-                  data={intentCounts.map((ic) => ({ intent: ic.intent, count: ic.count }))}
-                  margin={{ top: 8, right: 4, bottom: 0, left: -28 }}
-                  barCategoryGap="36%"
-                >
-                  <defs>
-                    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#fff" stopOpacity={1} />
-                      <stop offset="100%" stopColor="#fff" stopOpacity={0.4} />
-                    </linearGradient>
-                  </defs>
-
-                  <XAxis
-                    dataKey="intent"
-                    tick={{ fill: 'rgba(255,255,255,0.55)', fontSize: 9, fontWeight: 500 }}
-                    axisLine={false}
-                    tickLine={false}
-                    interval={0}
-                    dy={4}
-                  />
-                  <YAxis hide />
-
-                  <Tooltip
-                    cursor={{ fill: 'rgba(255,255,255,0.05)', radius: 4 }}
-                    content={<ChartTooltip accent="#fff" unit="calls" />}
-                  />
-
-                  <Bar
-                    dataKey="count"
-                    fill="url(#barGrad)"
-                    radius={[6, 6, 0, 0]}
-                    animationDuration={1200}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-
-          {/* Mini-stats row — Active Users style */}
-          <div className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {/* Mini-stats row */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {[
               {
                 label: 'Callers',
@@ -692,7 +750,7 @@ export default function DashboardView({ business }: { business: Business }) {
                   </span>
                 </div>
                 <p className="text-xl font-bold tracking-tight text-white">{s.value}</p>
-                <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.18), transparent)' }} />
+                <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, #4facfe, transparent)' }} />
               </motion.div>
             ))}
           </div>
