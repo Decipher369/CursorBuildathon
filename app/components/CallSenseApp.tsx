@@ -10,14 +10,13 @@ import DashboardView from './views/DashboardView';
 import SettingsView from './views/SettingsView';
 
 const viewPaths: Record<AppView, string> = {
-  dashboard: '/',
+  dashboard: '/dashboard',
   'call-logs': '/call-logs',
   agent: '/agent',
   settings: '/settings',
 };
 
 const pathToView: Record<string, AppView> = {
-  '/': 'dashboard',
   '/dashboard': 'dashboard',
   '/call-logs': 'call-logs',
   '/agent': 'agent',

@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
     const businessId = await resolveBusinessId(to);
     const baseUrl = getBaseUrl();
-    const actionUrl = `${baseUrl}/api/twilio/process?business_id=${encodeURIComponent(businessId)}`;
+    const actionUrl = `${baseUrl}/api/twilio/process-async?business_id=${encodeURIComponent(businessId)}`;
 
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const twiml = new VoiceResponse();
