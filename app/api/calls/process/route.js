@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getBusiness, insertCall } from '@/lib/supabase';
-import { getOrCreateCustomer, buildMemoryContext } from '@/lib/memory';
-import { processCall } from '@/lib/openai';
-import { textToSpeech } from '@/lib/elevenlabs';
+import { analyzeSentiment } from '@/lib/valsea';
+import { handleProcessCall } from '@/lib/process-call-handler';
 
 export async function POST(request) {
   try {
@@ -11,54 +9,28 @@ export async function POST(request) {
       business_id,
       phone_number,
       transcript,
-      sentiment_score,
-      sentiment_label,
+      sentiment_score: providedScore,
+      sentiment_label: providedLabel,
     } = body;
 
-    const business = await getBusiness(business_id);
-    const { customer, isReturning } = await getOrCreateCustomer(phone_number);
-    const memoryContext = await buildMemoryContext(customer.id);
-    const openaiResult = await processCall(transcript, business, memoryContext);
-    const audio_base64 = await textToSpeech(openaiResult.response);
+    let sentiment_score = providedScore;
+    let sentiment_label = providedLabel;
 
-    let escalated = openaiResult.escalate === true;
-    if (
-      !escalated &&
-      sentiment_label === 'negative' &&
-      business.escalation_threshold === 'low'
-    ) {
-      escalated = true;
+    if (sentiment_score == null || !sentiment_label) {
+      const sentiment = await analyzeSentiment(transcript);
+      sentiment_score = sentiment.score;
+      sentiment_label = sentiment.label;
     }
 
-    const call = await insertCall({
+    const result = await handleProcessCall({
       business_id,
-      customer_id: customer.id,
       phone_number,
       transcript,
       sentiment_score,
       sentiment_label,
-      intent: openaiResult.intent,
-      agent_response: openaiResult.response,
-      resolved: openaiResult.intent !== 'escalation',
-      escalated,
-      duration_seconds: 0,
     });
 
-    return NextResponse.json({
-      call_id: call.id,
-      transcript,
-      sentiment_score,
-      sentiment_label,
-      intent: openaiResult.intent,
-      response: openaiResult.response,
-      audio_base64,
-      escalated,
-      customer: {
-        id: customer.id,
-        isReturning,
-        total_calls: customer.total_calls,
-      },
-    });
+    return NextResponse.json(result);
   } catch (err) {
     return NextResponse.json(
       { error: true, message: err.message },
