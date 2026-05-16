@@ -45,12 +45,21 @@ function AnimatedNumber({ value, suffix = '', prefix = '' }: { value: number; su
 // ─── Premium Stat Card ───────────────────────────────────────────────────────
 
 const ICON_GRADIENTS: Record<string, string> = {
-  blue: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
-  purple: 'linear-gradient(135deg, #582CFF 0%, #BD00FF 100%)',
-  pink: 'linear-gradient(135deg, #FF0080 0%, #FF8C00 100%)',
-  green: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+  blue:   'linear-gradient(135deg, #21d4fd 0%, #08a8d2 100%)',   // bright cyan
+  purple: 'linear-gradient(135deg, #9b59f5 0%, #6c2ff5 100%)',   // vivid purple
+  pink:   'linear-gradient(135deg, #ff6b35 0%, #f72585 100%)',   // orange-red
+  green:  'linear-gradient(135deg, #2dde98 0%, #00b96b 100%)',   // bright green
   orange: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
-  cyan: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)',
+  cyan:   'linear-gradient(135deg, #21d4fd 0%, #08a8d2 100%)',
+};
+
+const ICON_SHADOWS: Record<string, string> = {
+  blue:   '0 8px 20px rgba(8,168,210,0.55)',
+  purple: '0 8px 20px rgba(108,47,245,0.55)',
+  pink:   '0 8px 20px rgba(247,37,133,0.55)',
+  green:  '0 8px 20px rgba(45,222,152,0.55)',
+  orange: '0 8px 20px rgba(246,211,101,0.4)',
+  cyan:   '0 8px 20px rgba(8,168,210,0.55)',
 };
 
 function StatCard({
@@ -84,7 +93,7 @@ function StatCard({
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
           style={{
             background: ICON_GRADIENTS[color] || ICON_GRADIENTS.blue,
-            boxShadow: `0 8px 20px ${color === 'blue' ? 'rgba(79,172,254,0.3)' : color === 'purple' ? 'rgba(88,44,255,0.3)' : color === 'pink' ? 'rgba(255,0,128,0.3)' : color === 'green' ? 'rgba(67,233,123,0.3)' : color === 'orange' ? 'rgba(246,211,101,0.3)' : 'rgba(0,201,255,0.3)'}`,
+            boxShadow: ICON_SHADOWS[color] || ICON_SHADOWS.blue,
           }}
         >
           {icon}
@@ -105,9 +114,9 @@ function HeroCard({ businessName, twilioPhone }: { businessName: string; twilioP
       className="relative overflow-hidden lg:col-span-2 rounded-3xl"
       style={{
         minHeight: 340,
-        background:
-          'linear-gradient(135deg, rgba(6, 11, 40, 0.94) 0%, rgba(8, 18, 50, 0.85) 60%, rgba(6, 11, 40, 0.6) 100%)',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+        background: 'linear-gradient(135deg, #060818 0%, #080d28 40%, #0c1550 75%, #101a6a 100%)',
+        backdropFilter: 'blur(22px)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
       }}
     >
       {/* Jellyfish photographic background */}
@@ -413,7 +422,7 @@ export default function DashboardView({ business }: { business: Business }) {
       )}
 
       {/* Top KPI row — 4 cards */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-4">
+      <div className="grid gap-6 grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard
           label="Total Calls"
           value={loading ? 0 : kpis.totalCalls}
@@ -451,14 +460,14 @@ export default function DashboardView({ business }: { business: Business }) {
       </div>
 
       {/* Hero + Satisfaction + Referral */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-4 mb-4">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-4 mb-6">
         <HeroCard businessName={business.name} twilioPhone={business.twilio_phone_number} />
         <SatisfactionGauge pct={loading ? 0 : kpis.positivePercent} />
         <ReferralCard unique={loading ? 0 : kpis.uniqueCallers} returning={loading ? 0 : kpis.returningCallers} />
       </div>
 
       {/* Call Volume + Intents Bar Chart */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 mb-4">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 mb-6">
 
         {/* Call Volume Area Chart — Sales Overview style */}
         <motion.div
@@ -467,9 +476,9 @@ export default function DashboardView({ business }: { business: Business }) {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="relative overflow-hidden rounded-3xl p-6"
           style={{
-            background: 'linear-gradient(127deg, rgba(6, 11, 40, 0.92) 28%, rgba(8, 16, 45, 0.8) 91%)',
-            border: 'none',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 0 60px rgba(0,200,255,0.04)',
+          background: 'linear-gradient(135deg, #060818 0%, #080d28 40%, #0c1550 75%, #101a6a 100%)',
+          backdropFilter: 'blur(22px)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
           }}
         >
           {/* Cyan ambient glow */}
@@ -721,7 +730,7 @@ export default function DashboardView({ business }: { business: Business }) {
       </div>
 
       {/* Recent Calls table + Activity feed — Vision UI Projects/Orders style */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-5">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-5">
 
         {/* Recent Calls — Projects table style (3/5 width) */}
         <motion.div

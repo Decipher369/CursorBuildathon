@@ -44,44 +44,51 @@ export default function AppShell({
     .toUpperCase();
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%', position: 'relative' }}>
-      {/* Cyan light — wide spread, high brightness */}
+    <div style={{ display: 'flex', height: '100vh', width: '100%', overflow: 'hidden', position: 'relative', background: 'transparent' }}>
+      {/* Light blue glow — massive, bright, spread across the whole page */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        {/* Massive wide spread base — covers most of the viewport */}
+        {/* Full-page royal blue base wash */}
         <div style={{
-          position: 'absolute',
-          width: '120vw', height: '120vw',
-          top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(0,220,255,0.18) 0%, rgba(0,200,255,0.08) 40%, transparent 68%)',
-          filter: 'blur(60px)',
-          animation: 'wave-drift 16s ease-in-out infinite',
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(ellipse 160% 120% at 50% 50%, rgba(45,53,197,0.55) 0%, rgba(35,42,180,0.3) 45%, transparent 70%)',
+          filter: 'blur(40px)',
+          animation: 'wave-drift 18s ease-in-out infinite',
         }} />
         {/* Bright vivid centre hotspot */}
         <div style={{
           position: 'absolute',
-          width: '50vw', height: '50vw',
+          width: '60vw', height: '60vw',
           top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(0,240,255,0.42) 0%, rgba(0,220,255,0.22) 30%, rgba(0,200,255,0.08) 55%, transparent 70%)',
-          filter: 'blur(30px)',
-          animation: 'wave-drift 10s ease-in-out infinite reverse',
+          background: 'radial-gradient(circle, rgba(65,75,220,0.7) 0%, rgba(50,60,210,0.45) 25%, rgba(40,50,200,0.2) 50%, transparent 68%)',
+          filter: 'blur(22px)',
+          animation: 'wave-drift 11s ease-in-out infinite reverse',
         }} />
         {/* Upper spread */}
         <div style={{
           position: 'absolute',
-          width: '80vw', height: '60vw',
-          top: '-10%', left: '20%',
-          background: 'radial-gradient(circle, rgba(0,230,255,0.14) 0%, transparent 60%)',
+          width: '90vw', height: '70vw',
+          top: '-20%', left: '10%',
+          background: 'radial-gradient(circle, rgba(50,60,210,0.45) 0%, transparent 60%)',
           filter: 'blur(50px)',
-          animation: 'wave-drift 13s ease-in-out infinite',
+          animation: 'wave-drift 14s ease-in-out infinite',
         }} />
         {/* Lower spread */}
         <div style={{
           position: 'absolute',
-          width: '80vw', height: '60vw',
-          top: '60%', left: '15%',
-          background: 'radial-gradient(circle, rgba(0,220,255,0.14) 0%, transparent 60%)',
+          width: '90vw', height: '70vw',
+          top: '55%', left: '15%',
+          background: 'radial-gradient(circle, rgba(45,55,205,0.4) 0%, transparent 60%)',
           filter: 'blur(50px)',
-          animation: 'wave-drift 19s ease-in-out infinite reverse',
+          animation: 'wave-drift 21s ease-in-out infinite reverse',
+        }} />
+        {/* Right fill */}
+        <div style={{
+          position: 'absolute',
+          width: '60vw', height: '80vw',
+          top: '10%', right: '-10%',
+          background: 'radial-gradient(circle, rgba(50,60,210,0.38) 0%, transparent 60%)',
+          filter: 'blur(55px)',
+          animation: 'wave-drift 16s ease-in-out infinite',
         }} />
       </div>
 
@@ -96,44 +103,36 @@ export default function AppShell({
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          /* Dark navy base, purple glow pools at the bottom like the reference */
-          background: 'linear-gradient(180deg, #0f1535 0%, #0d1130 55%, #0b0e28 100%)',
+          background: 'transparent',
           borderRight: 'none',
           position: 'relative' as const,
         }}
       >
-        {/* Purple glow blob at bottom — matches reference */}
-        <div style={{
-          position: 'absolute', bottom: '-10%', left: '-20%',
-          width: '140%', height: '55%', pointerEvents: 'none', zIndex: 0,
-          background: 'radial-gradient(ellipse 70% 60% at 50% 100%, rgba(88,44,255,0.28) 0%, transparent 70%)',
-        }} />
-
         {/* Logo */}
-        <div style={{ position: 'relative', zIndex: 1, padding: '24px 24px 20px' }}>
+        <div style={{ position: 'relative', zIndex: 1, padding: '28px 24px 22px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              width: '38px', height: '38px', borderRadius: '10px', flexShrink: 0,
+              width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
               background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
             }}>
-              <span style={{ fontSize: '16px', fontWeight: 900, color: '#0f1535', letterSpacing: '-1px' }}>CS</span>
+              <span style={{ fontSize: '14px', fontWeight: 900, color: '#0a10a0' }}>CS</span>
             </div>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: '15px', letterSpacing: '0.04em' }}>
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: '14px', letterSpacing: '0.12em' }}>
               CALLSENSE
-            </div>
+            </span>
           </div>
         </div>
 
-        <div style={{ position: 'relative', zIndex: 1, height: '1px', margin: '0 20px 4px', background: 'rgba(255,255,255,0.08)' }} />
+        <div style={{ position: 'relative', zIndex: 1, height: '1px', margin: '0 20px 6px', background: 'transparent' }} />
 
-        {/* Nav section label */}
-        <div style={{ position: 'relative', zIndex: 1, padding: '16px 24px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
+        {/* PAGES label */}
+        <div style={{ position: 'relative', zIndex: 1, padding: '14px 24px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
           Pages
         </div>
 
         {/* Nav items */}
-        <nav style={{ position: 'relative', zIndex: 1, padding: '0 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <nav style={{ position: 'relative', zIndex: 1, padding: '0 14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {nav.map(({ id, label, Icon }) => {
             const active = activeView === id;
             return (
@@ -142,13 +141,13 @@ export default function AppShell({
                 type="button"
                 onClick={() => onNavigate(id)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  width: '100%', padding: '10px 12px', borderRadius: '12px',
+                  display: 'flex', alignItems: 'center', gap: '14px',
+                  width: '100%', padding: '11px 14px', borderRadius: '14px',
                   border: 'none', cursor: 'pointer', textAlign: 'left',
                   fontSize: '14px', fontWeight: active ? 700 : 500,
-                  color: active ? '#fff' : 'rgba(255,255,255,0.5)',
-                  background: active ? 'rgba(255,255,255,0.07)' : 'transparent',
-                  transition: 'all 0.2s',
+                  color: '#fff',
+                  background: active ? 'rgba(255,255,255,0.09)' : 'transparent',
+                  transition: 'background 0.2s',
                 }}
               >
                 <span style={{
@@ -156,19 +155,19 @@ export default function AppShell({
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: active
                     ? 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)'
-                    : 'rgba(255,255,255,0.07)',
-                  boxShadow: active ? '0 4px 14px rgba(79,172,254,0.45)' : 'none',
+                    : 'rgba(255,255,255,0.08)',
+                  boxShadow: active ? '0 4px 14px rgba(79,172,254,0.5)' : 'none',
                   transition: 'all 0.2s',
                 }}>
-                  <Icon style={{ width: '16px', height: '16px', color: active ? '#fff' : 'rgba(255,255,255,0.5)' }} />
+                  <Icon style={{ width: '16px', height: '16px', color: active ? '#fff' : 'rgba(255,255,255,0.6)' }} />
                 </span>
-                {label}
+                <span style={{ opacity: active ? 1 : 0.7 }}>{label}</span>
               </button>
             );
           })}
 
-          {/* Tools section */}
-          <div style={{ padding: '16px 12px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
+          {/* TOOLS label */}
+          <div style={{ padding: '18px 14px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
             Tools
           </div>
 
@@ -177,12 +176,12 @@ export default function AppShell({
             { href: '/admin',   label: 'Test Agent', Icon: IconFlask    },
           ].map(({ href, label, Icon }) => (
             <a key={href} href={href} style={{
-              display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
-              borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
-              color: 'rgba(255,255,255,0.5)', transition: 'all 0.2s',
+              display: 'flex', alignItems: 'center', gap: '14px', padding: '11px 14px',
+              borderRadius: '14px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
+              color: 'rgba(255,255,255,0.7)', transition: 'background 0.2s',
             }}>
-              <span style={{ width: '34px', height: '34px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.07)' }}>
-                <Icon style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.5)' }} />
+              <span style={{ width: '34px', height: '34px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(255,255,255,0.08)' }}>
+                <Icon style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.6)' }} />
               </span>
               {label}
             </a>
@@ -262,19 +261,21 @@ export default function AppShell({
         </div>
       </aside>
 
-      {/* Main content */}
-      <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        {/* Top bar */}
-        <div
-          style={{
-            position: 'sticky', top: 0, zIndex: 20,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '12px 24px',
-            background: 'rgba(255,255,255,0.02)',
-            backdropFilter: 'blur(10px)',
-            borderBottom: 'none',
-          }}
-        >
+      {/* Main content — scrolls independently, sidebar stays fixed */}
+      <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto', background: 'transparent' }}>
+        {/* Floating top bar — stays at top while content scrolls */}
+        <div style={{ position: 'sticky', top: 0, zIndex: 20, padding: '12px 16px 0' }}>
+          <div
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '10px 20px',
+              background: 'linear-gradient(135deg, rgba(6,8,24,0.75) 0%, rgba(8,13,40,0.65) 50%, rgba(12,21,80,0.6) 100%)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: '16px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.05) inset',
+            }}
+          >
           <div>
             <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
               {/* Home icon */}
@@ -320,10 +321,11 @@ export default function AppShell({
               <span style={{ position: 'absolute', top: '2px', right: '2px', width: '7px', height: '7px', borderRadius: '50%', background: '#f5576c' }} />
             </button>
           </div>
-        </div>
+          </div>{/* end glass pill */}
+        </div>{/* end sticky wrapper */}
 
         {/* Page content */}
-        <div style={{ flex: 1, padding: '24px' }}>
+        <div style={{ flex: 1, padding: '24px 28px' }}>
           {children}
         </div>
       </main>
