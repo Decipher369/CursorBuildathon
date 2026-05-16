@@ -270,49 +270,54 @@ export default function AppShell({
             position: 'sticky', top: 0, zIndex: 20,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '12px 24px',
-            background: 'linear-gradient(127.09deg, rgba(6,11,40,0.88) 19.41%, rgba(8,16,45,0.82) 76.65%)',
-            backdropFilter: 'blur(20px)',
+            background: 'rgba(255,255,255,0.02)',
+            backdropFilter: 'blur(10px)',
             borderBottom: 'none',
           }}
         >
           <div>
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-              Pages / <span style={{ color: '#fff' }}>{VIEW_TITLES[activeView]}</span>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {/* Home icon */}
+              <svg style={{ width: '11px', height: '11px', color: 'rgba(255,255,255,0.45)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              <span style={{ color: 'rgba(255,255,255,0.4)' }}>/</span>
+              <span style={{ color: 'rgba(255,255,255,0.6)' }}>{VIEW_TITLES[activeView]}</span>
             </p>
             <p style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: 0 }}>{VIEW_TITLES[activeView]}</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {/* Search */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', width: '220px' }}>
-              <svg style={{ width: '14px', height: '14px', color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', width: '200px' }}>
+              <svg style={{ width: '13px', height: '13px', color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
               </svg>
               <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Type here...</span>
             </div>
 
-            {/* Profile */}
-            <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 14px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
-              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 700, color: '#fff' }}>
-                {initials}
-              </div>
+            {/* Sign in / profile */}
+            <button style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '7px 16px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', border: 'none', cursor: 'pointer' }}>
+              <svg style={{ width: '15px', height: '15px', color: 'rgba(255,255,255,0.7)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
               <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{business.name.split(' ')[0]}</span>
             </button>
 
             {/* Settings */}
-            <button style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <svg style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.5)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <button style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg style={{ width: '15px', height: '15px', color: 'rgba(255,255,255,0.6)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
               </svg>
             </button>
 
             {/* Notifications */}
-            <button style={{ position: 'relative', width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <svg style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.5)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <button style={{ position: 'relative', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg style={{ width: '15px', height: '15px', color: 'rgba(255,255,255,0.6)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
-              <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', borderRadius: '50%', background: '#f5576c', boxShadow: '0 0 6px #f5576c' }} />
+              <span style={{ position: 'absolute', top: '2px', right: '2px', width: '7px', height: '7px', borderRadius: '50%', background: '#f5576c' }} />
             </button>
           </div>
         </div>
