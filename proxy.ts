@@ -1,13 +1,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/login', '/api/twilio', '/api/config'];
+const PROTECTED = ['/dashboard', '/agent', '/call-logs', '/settings', '/onboarding', '/demo', '/admin'];
 
-function isPublic(pathname: string) {
-  return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+function isProtected(pathname: string) {
+  return PROTECTED.some((p) => pathname === p || pathname.startsWith(p + '/'));
 }
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (!isProtected(pathname)) return NextResponse.next({ request });
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -31,30 +35,14 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Refresh the session (extends expiry) — must not use getUser() shortcut
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-
-  // Allow public paths regardless of auth state
-  if (isPublic(pathname)) {
-    return supabaseResponse;
-  }
-
-  // Unauthenticated → redirect to /login
   if (!user) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
-    return NextResponse.redirect(loginUrl);
+    const url = request.nextUrl.clone();
+    url.pathname = '/signin';
+    url.searchParams.set('next', pathname);
+    return NextResponse.redirect(url);
   }
 
   return supabaseResponse;
 }
-
-export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp3|wav|ico)$).*)',
-  ],
-};

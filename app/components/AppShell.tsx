@@ -46,7 +46,7 @@ export default function AppShell({
     setSigningOut(true);
     const supabase = getSupabaseBrowser();
     await supabase.auth.signOut();
-    router.push('/login');
+    router.push('/signin');
     router.refresh();
   }
 
