@@ -197,92 +197,77 @@ function HeroCard({ businessName, twilioPhone }: { businessName: string; twilioP
 // ─── Satisfaction Rate (Half-circle gauge) ───────────────────────────────────
 
 function SatisfactionGauge({ pct }: { pct: number }) {
-  const r = 70;
-  const circ = Math.PI * r; // half circle
+  // Half-circle arc: cx=100, cy=100, r=72, from left to right along the top
+  const r = 72;
+  const circ = Math.PI * r;
   const dash = (pct / 100) * circ;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, duration: 0.6 }}
-      className="card-premium relative flex flex-col p-6"
+      className="card-premium flex flex-col p-5"
     >
-      <p className="text-lg font-bold text-white">Satisfaction Rate</p>
+      <p className="text-base font-bold text-white">Satisfaction Rate</p>
       <p className="mt-0.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>From all calls</p>
 
-      <div className="relative mt-4 flex flex-1 flex-col items-center justify-end">
-        {/* Half-circle gauge */}
-        <svg width="200" height="120" viewBox="0 0 200 120" className="overflow-visible">
+      {/* Gauge — fully self-contained in SVG, no negative margins */}
+      <div className="mt-4 flex flex-col items-center">
+        {/* viewBox: 200 wide, 120 tall — arc fits with room for stroke */}
+        <svg width="100%" viewBox="0 0 200 115" style={{ maxWidth: '200px', overflow: 'visible' }}>
           <defs>
             <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#582CFF" />
               <stop offset="50%" stopColor="#4facfe" />
               <stop offset="100%" stopColor="#00f2fe" />
             </linearGradient>
-            <filter id="gaugeGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
           </defs>
 
+          {/* Track */}
           <path
-            d="M 30 100 A 70 70 0 0 1 170 100"
+            d="M 28 104 A 72 72 0 0 1 172 104"
             fill="none"
-            stroke="rgba(255,255,255,0.06)"
-            strokeWidth="14"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth="12"
             strokeLinecap="round"
           />
+          {/* Filled arc */}
           <motion.path
-            d="M 30 100 A 70 70 0 0 1 170 100"
+            d="M 28 104 A 72 72 0 0 1 172 104"
             fill="none"
             stroke="url(#gaugeGrad)"
-            strokeWidth="14"
+            strokeWidth="12"
             strokeLinecap="round"
             strokeDasharray={circ}
             initial={{ strokeDashoffset: circ }}
             animate={{ strokeDashoffset: circ - dash }}
             transition={{ duration: 1.5, ease: 'easeOut', delay: 0.4 }}
-            filter="url(#gaugeGlow)"
           />
 
-          {/* Center smile badge */}
-          <foreignObject x="76" y="56" width="48" height="48">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-full"
-              style={{
-                background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
-                boxShadow: '0 8px 24px rgba(79,172,254,0.55), 0 0 0 4px rgba(13,20,64,0.6)',
-              }}
-            >
-              <IconSmile className="h-6 w-6 text-white" />
-            </div>
-          </foreignObject>
+          {/* Smiley badge — centered inside the half-circle bowl at (100, 72) */}
+          <circle cx="100" cy="72" r="18"
+            fill="url(#gaugeGrad)"
+            style={{ filter: 'drop-shadow(0 4px 12px rgba(79,172,254,0.6))' }}
+          />
+          <circle cx="94" cy="69" r="1.8" fill="white" />
+          <circle cx="106" cy="69" r="1.8" fill="white" />
+          <path d="M 94 76 Q 100 81 106 76" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
 
-        {/* Inner stat pill — Vision UI signature */}
+        {/* Stat row below gauge — clean, no overlap */}
         <div
-          className="-mt-8 grid w-full grid-cols-3 items-center rounded-2xl px-5 py-3"
+          className="mt-3 flex w-full items-center justify-between rounded-xl px-4 py-3"
           style={{
-            background: 'linear-gradient(127deg, rgba(6, 11, 40, 0.9) 28%, rgba(10, 14, 35, 0.7) 91%)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.07)',
           }}
         >
-          <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>0%</span>
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>0%</span>
           <div className="text-center">
-            <p className="text-3xl font-bold leading-none text-white" style={{ letterSpacing: '-0.02em' }}>
-              {pct}%
-            </p>
-            <p className="mt-1 text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              Based on calls
-            </p>
+            <p className="text-2xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>{pct}%</p>
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Based on calls</p>
           </div>
-          <span className="text-right text-xs font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>100%</span>
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>100%</span>
         </div>
       </div>
     </motion.div>
@@ -329,33 +314,34 @@ function ReferralCard({ unique, returning }: { unique: number; returning: number
           </div>
         </div>
 
-        {/* Ring */}
-        <div className="flex flex-col items-center justify-center">
-          <svg width="120" height="120" viewBox="0 0 120 120">
+        {/* Ring with label overlaid using absolute positioning */}
+        <div className="relative flex items-center justify-center" style={{ width: '100px', height: '100px' }}>
+          <svg width="100" height="100" viewBox="0 0 100 100">
             <defs>
               <linearGradient id="refGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#43e97b" />
                 <stop offset="100%" stopColor="#38f9d7" />
               </linearGradient>
             </defs>
-            <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
             <motion.circle
-              cx="60" cy="60" r={r}
+              cx="50" cy="50" r="38"
               fill="none"
               stroke="url(#refGrad)"
-              strokeWidth="8"
+              strokeWidth="7"
               strokeLinecap="round"
               strokeDasharray={circ}
               initial={{ strokeDashoffset: circ }}
               animate={{ strokeDashoffset: circ - dash }}
               transition={{ duration: 1.4, delay: 0.5, ease: 'easeOut' }}
-              transform="rotate(-90 60 60)"
+              transform="rotate(-90 50 50)"
             />
           </svg>
-          <div className="-mt-[88px] flex flex-col items-center text-center">
-            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Safety</p>
-            <p className="text-2xl font-bold text-white">{score}</p>
-            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>Total Score</p>
+          {/* Label centered over ring */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Safety</p>
+            <p className="text-lg font-bold text-white leading-none">{score}</p>
+            <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.4)' }}>Total Score</p>
           </div>
         </div>
       </div>
@@ -636,100 +622,71 @@ export default function DashboardView({ business }: { business: Business }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.6 }}
-          className="card-premium relative p-6"
+          className="card-premium relative overflow-hidden"
         >
-          {/* Bar chart at top — pure bars on the card, no inner panel */}
-          <ResponsiveContainer width="100%" height={170}>
-            <BarChart
-              data={callsByDay}
-              margin={{ top: 16, right: 8, bottom: 4, left: -20 }}
-              barCategoryGap="38%"
-            >
-              <defs>
-                <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#fff" stopOpacity={1} />
-                  <stop offset="80%" stopColor="#fff" stopOpacity={0.55} />
-                  <stop offset="100%" stopColor="#fff" stopOpacity={0.15} />
-                </linearGradient>
-              </defs>
+          {/* Dark inner chart panel */}
+          <div
+            className="rounded-2xl mx-3 mt-3"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: '8px 4px 4px' }}
+          >
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart
+                data={callsByDay}
+                margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+                barCategoryGap="40%"
+              >
+                <defs>
+                  <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#fff" stopOpacity={0.95} />
+                    <stop offset="100%" stopColor="#fff" stopOpacity={0.25} />
+                  </linearGradient>
+                </defs>
 
-              <CartesianGrid
-                strokeDasharray="4 4"
-                stroke="rgba(255,255,255,0.06)"
-                vertical={false}
-              />
+                <YAxis
+                  tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                  width={30}
+                />
 
-              <XAxis
-                dataKey="shortLabel"
-                tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 500 }}
-                axisLine={false}
-                tickLine={false}
-                interval={0}
-                dy={6}
-              />
-              <YAxis
-                tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 500 }}
-                axisLine={false}
-                tickLine={false}
-                allowDecimals={false}
-                width={28}
-              />
+                <Tooltip
+                  cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                  content={<ChartTooltip accent="#fff" unit="calls" />}
+                />
 
-              <Tooltip
-                cursor={{ fill: 'rgba(255,255,255,0.04)', radius: 4 }}
-                content={<ChartTooltip accent="#fff" unit="calls" />}
-              />
+                <Bar
+                  dataKey="count"
+                  fill="url(#barGrad)"
+                  radius={[6, 6, 0, 0]}
+                  animationDuration={1200}
+                  style={{ filter: 'drop-shadow(0 -2px 8px rgba(255,255,255,0.2))' }}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-              <Bar
-                dataKey="count"
-                fill="url(#barGrad)"
-                radius={[8, 8, 2, 2]}
-                animationDuration={1200}
-                style={{ filter: 'drop-shadow(0 -2px 12px rgba(255,255,255,0.18))' }}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-
-          {/* Header sits BELOW the chart in Vision UI Active Users layout */}
-          <div className="mb-3 mt-4">
+          {/* Header below chart */}
+          <div className="px-5 pt-4 pb-2">
             <p className="text-base font-bold text-white">Active Calls</p>
-            <div className="mt-1 flex items-center gap-1.5 text-xs">
+            <div className="mt-0.5 flex items-center gap-1.5 text-xs">
               <span className="font-bold" style={{ color: '#01B574' }}>
                 (+{kpis.totalCalls})
               </span>
-              <span style={{ color: 'rgba(255,255,255,0.5)' }}>
-                than last week
-              </span>
+              <span style={{ color: 'rgba(255,255,255,0.5)' }}>than last week</span>
             </div>
           </div>
 
+          {/* Divider */}
+          <div className="mx-5 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+
           {/* Mini-stats row */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-4 gap-3 px-5 py-4">
             {[
-              {
-                label: 'Callers',
-                value: kpis.uniqueCallers.toLocaleString(),
-                Icon: IconUsers,
-                gradient: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
-              },
-              {
-                label: 'Calls',
-                value: kpis.totalCalls.toLocaleString(),
-                Icon: IconPhone,
-                gradient: 'linear-gradient(135deg, #582CFF 0%, #BD00FF 100%)',
-              },
-              {
-                label: 'Resolved',
-                value: `${kpis.positivePercent}%`,
-                Icon: IconCheckCircle,
-                gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-              },
-              {
-                label: 'Intents',
-                value: intentCounts.length.toString(),
-                Icon: IconBarChart,
-                gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
-              },
+              { label: 'Callers',  value: kpis.uniqueCallers.toLocaleString(), Icon: IconUsers       },
+              { label: 'Calls',    value: kpis.totalCalls.toLocaleString(),    Icon: IconPhone       },
+              { label: 'Resolved', value: `${kpis.positivePercent}%`,          Icon: IconCheckCircle },
+              { label: 'Intents',  value: intentCounts.length.toString(),      Icon: IconBarChart    },
             ].map((s, i) => (
               <motion.div
                 key={s.label}
@@ -740,17 +697,21 @@ export default function DashboardView({ business }: { business: Business }) {
               >
                 <div className="flex items-center gap-2">
                   <span
-                    className="flex h-7 w-7 items-center justify-center rounded-lg"
-                    style={{ background: s.gradient }}
+                    className="flex shrink-0 items-center justify-center rounded-lg"
+                    style={{
+                      width: '30px', height: '30px',
+                      background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
+                      boxShadow: '0 4px 10px rgba(79,172,254,0.35)',
+                    }}
                   >
-                    <s.Icon className="h-3.5 w-3.5 text-white" />
+                    <s.Icon className="text-white" style={{ width: '14px', height: '14px', strokeWidth: 2.5 }} />
                   </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.55)' }}>
                     {s.label}
                   </span>
                 </div>
-                <p className="text-xl font-bold tracking-tight text-white">{s.value}</p>
-                <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, #4facfe, transparent)' }} />
+                <p className="text-xl font-bold tracking-tight text-white leading-none">{s.value}</p>
+                <div className="h-0.5 w-full rounded-full" style={{ background: 'linear-gradient(90deg, #4facfe 0%, rgba(79,172,254,0.2) 100%)' }} />
               </motion.div>
             ))}
           </div>
