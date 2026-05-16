@@ -120,7 +120,7 @@ export default async function HomePage() {
     /* DB unavailable — show landing anyway */
   }
 
-  const ctaHref = hasApp ? '/dashboard' : '/onboarding';
+  const ctaHref = hasApp ? '/dashboard' : '/signin';
   const ctaLabel = hasApp ? `Open Dashboard` : 'Get Started Free';
 
   return (

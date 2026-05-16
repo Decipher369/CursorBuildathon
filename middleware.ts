@@ -1,13 +1,19 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/login', '/api/twilio', '/api/config'];
+// Routes that require auth
+const PROTECTED = ['/dashboard', '/agent', '/call-logs', '/settings', '/onboarding', '/demo', '/admin'];
 
-function isPublic(pathname: string) {
-  return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+function isProtected(pathname: string) {
+  return PROTECTED.some((p) => pathname === p || pathname.startsWith(p + '/'));
 }
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Only run auth check on protected routes
+  if (!isProtected(pathname)) return NextResponse.next({ request });
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -31,23 +37,13 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // Refresh the session (extends expiry) — must not use getUser() shortcut
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-
-  // Allow public paths regardless of auth state
-  if (isPublic(pathname)) {
-    return supabaseResponse;
-  }
-
-  // Unauthenticated → redirect to /login
   if (!user) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
-    return NextResponse.redirect(loginUrl);
+    const url = request.nextUrl.clone();
+    url.pathname = '/signin';
+    url.searchParams.set('next', pathname);
+    return NextResponse.redirect(url);
   }
 
   return supabaseResponse;
