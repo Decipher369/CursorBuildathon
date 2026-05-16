@@ -45,43 +45,43 @@ export default function AppShell({
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', width: '100%', position: 'relative' }}>
-      {/* Cyan bubble orbs floating in the centre of the page */}
+      {/* Cyan light — wide spread, high brightness */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        {/* Large centre orb */}
+        {/* Massive wide spread base — covers most of the viewport */}
         <div style={{
-          position: 'absolute', borderRadius: '50%',
-          width: '520px', height: '520px',
-          top: '30%', left: '50%', transform: 'translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(0,210,255,0.13) 0%, rgba(0,180,255,0.06) 40%, transparent 70%)',
-          filter: 'blur(40px)',
-          animation: 'wave-drift 14s ease-in-out infinite',
+          position: 'absolute',
+          width: '120vw', height: '120vw',
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(0,220,255,0.18) 0%, rgba(0,200,255,0.08) 40%, transparent 68%)',
+          filter: 'blur(60px)',
+          animation: 'wave-drift 16s ease-in-out infinite',
         }} />
-        {/* Upper-left bubble */}
+        {/* Bright vivid centre hotspot */}
         <div style={{
-          position: 'absolute', borderRadius: '50%',
-          width: '300px', height: '300px',
-          top: '15%', left: '35%',
-          background: 'radial-gradient(circle, rgba(0,230,255,0.11) 0%, transparent 65%)',
+          position: 'absolute',
+          width: '50vw', height: '50vw',
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(0,240,255,0.42) 0%, rgba(0,220,255,0.22) 30%, rgba(0,200,255,0.08) 55%, transparent 70%)',
           filter: 'blur(30px)',
           animation: 'wave-drift 10s ease-in-out infinite reverse',
         }} />
-        {/* Lower-right bubble */}
+        {/* Upper spread */}
         <div style={{
-          position: 'absolute', borderRadius: '50%',
-          width: '360px', height: '360px',
-          top: '60%', left: '62%',
-          background: 'radial-gradient(circle, rgba(0,200,255,0.1) 0%, transparent 65%)',
-          filter: 'blur(35px)',
-          animation: 'wave-drift 18s ease-in-out infinite',
+          position: 'absolute',
+          width: '80vw', height: '60vw',
+          top: '-10%', left: '20%',
+          background: 'radial-gradient(circle, rgba(0,230,255,0.14) 0%, transparent 60%)',
+          filter: 'blur(50px)',
+          animation: 'wave-drift 13s ease-in-out infinite',
         }} />
-        {/* Small accent bubble */}
+        {/* Lower spread */}
         <div style={{
-          position: 'absolute', borderRadius: '50%',
-          width: '180px', height: '180px',
-          top: '45%', left: '42%',
-          background: 'radial-gradient(circle, rgba(80,230,255,0.14) 0%, transparent 60%)',
-          filter: 'blur(20px)',
-          animation: 'wave-drift 8s ease-in-out infinite reverse',
+          position: 'absolute',
+          width: '80vw', height: '60vw',
+          top: '60%', left: '15%',
+          background: 'radial-gradient(circle, rgba(0,220,255,0.14) 0%, transparent 60%)',
+          filter: 'blur(50px)',
+          animation: 'wave-drift 19s ease-in-out infinite reverse',
         }} />
       </div>
 
