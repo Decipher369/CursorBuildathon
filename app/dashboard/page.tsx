@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import Dashboard from '@/app/components/Dashboard';
 import { getAllBusinesses } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   let businesses;
   try {
