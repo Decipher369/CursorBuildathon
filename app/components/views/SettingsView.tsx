@@ -1,10 +1,25 @@
 'use client';
 
 import Link from 'next/link';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import type { Business } from '@/lib/business-types';
 import { IconArrowRight, IconFlask, IconPhone, IconSettings } from '../icons';
+
+const BUSINESS_TYPES = ['restaurant', 'clinic', 'salon', 'retail', 'other'];
+const ESCALATION_THRESHOLDS = [
+  { value: 'negative', label: 'Negative only' },
+  { value: 'neutral_or_worse', label: 'Neutral or worse' },
+  { value: 'never', label: 'Never escalate' },
+];
+
+const inputCls =
+  'w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-teal-500/60 transition-colors';
+
+const inputStyle = {
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.1)',
+};
 
 function StatRow({ label, value, mono = false, capitalize = false, uppercase = false }: { label: string; value: string; mono?: boolean; capitalize?: boolean; uppercase?: boolean }) {
   return (
@@ -21,10 +36,57 @@ function StatRow({ label, value, mono = false, capitalize = false, uppercase = f
   );
 }
 
-export default function SettingsView({ business }: { business: Business }) {
+export default function SettingsView({
+  business,
+  onSaved,
+}: {
+  business: Business;
+  onSaved?: (updated: Business) => void;
+}) {
   const [voiceWebhook, setVoiceWebhook] = useState('');
   const [appUrl, setAppUrl] = useState('');
   const [copied, setCopied] = useState(false);
+
+  // Profile edit state
+  const [name, setName] = useState(business.name);
+  const [type, setType] = useState(business.type ?? 'restaurant');
+  const [hours, setHours] = useState(business.hours ?? '');
+  const [twilioPhone, setTwilioPhone] = useState(business.twilio_phone_number ?? '');
+  const [escalationThreshold, setEscalationThreshold] = useState(
+    business.escalation_threshold ?? 'negative',
+  );
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+    try {
+      const res = await fetch(`/api/businesses/${business.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          type,
+          hours: hours || undefined,
+          twilio_phone_number: twilioPhone || undefined,
+          escalation_threshold: escalationThreshold,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to save');
+      onSaved?.(data);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  }
 
   useEffect(() => {
     fetch('/api/config/public')
@@ -80,8 +142,8 @@ export default function SettingsView({ business }: { business: Business }) {
         </div>
       </motion.div>
 
-      <div className="grid max-w-4xl gap-4 xl:grid-cols-2">
-        {/* Business card */}
+      <div className="max-w-4xl space-y-4">
+        {/* ── Business Profile Edit ── */}
         <motion.section
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -95,7 +157,116 @@ export default function SettingsView({ business }: { business: Business }) {
             >
               <IconPhone className="h-4 w-4 text-white" />
             </span>
-            <h2 className="text-base font-bold text-white">Business</h2>
+            <h2 className="text-base font-bold text-white">Business Profile</h2>
+          </div>
+
+          <AnimatePresence>
+            {saveError && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+              >
+                {saveError}
+              </motion.div>
+            )}
+            {saveSuccess && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-4 rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm text-teal-400"
+              >
+                ✓ Profile updated.
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  Business Name
+                </label>
+                <input className={inputCls} style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} required />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  Business Type
+                </label>
+                <select className={`${inputCls} appearance-none`} style={inputStyle} value={type} onChange={(e) => setType(e.target.value)}>
+                  {BUSINESS_TYPES.map((t) => (
+                    <option key={t} value={t} className="bg-slate-900 capitalize">
+                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  Twilio Phone
+                </label>
+                <input className={`${inputCls} font-mono`} style={inputStyle} value={twilioPhone} onChange={(e) => setTwilioPhone(e.target.value)} placeholder="+6591234567" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  Escalation Threshold
+                </label>
+                <select className={`${inputCls} appearance-none`} style={inputStyle} value={escalationThreshold} onChange={(e) => setEscalationThreshold(e.target.value)}>
+                  {ESCALATION_THRESHOLDS.map((t) => (
+                    <option key={t.value} value={t.value} className="bg-slate-900">{t.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                Business Hours
+              </label>
+              <input className={inputCls} style={inputStyle} value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. Mon–Fri 9am–6pm, Sat 10am–4pm" />
+            </div>
+            <motion.button
+              type="submit"
+              disabled={saving}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="rounded-xl px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-all disabled:opacity-40"
+              style={{
+                background: 'linear-gradient(310deg, #4facfe 0%, #00f2fe 100%)',
+                boxShadow: '0 8px 24px rgba(79,172,254,0.35)',
+              }}
+            >
+              {saving ? (
+                <span className="flex items-center gap-2">
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block h-3.5 w-3.5 rounded-full border-2 border-white border-t-transparent"
+                  />
+                  Saving…
+                </span>
+              ) : 'Save Profile'}
+            </motion.button>
+          </form>
+        </motion.section>
+
+        <div className="grid gap-4 xl:grid-cols-2">
+        {/* Business info (read-only) */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08, duration: 0.5 }}
+          className="card-premium p-6"
+        >
+          <div className="mb-4 flex items-center gap-2">
+            <span
+              className="flex h-8 w-8 items-center justify-center rounded-lg"
+              style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)' }}
+            >
+              <IconPhone className="h-4 w-4 text-white" />
+            </span>
+            <h2 className="text-base font-bold text-white">Current Values</h2>
           </div>
           <dl className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
             <StatRow label="Name" value={business.name} />
@@ -187,6 +358,7 @@ export default function SettingsView({ business }: { business: Business }) {
             <IconArrowRight className="h-3.5 w-3.5" />
           </Link>
         </motion.section>
+        </div>
       </div>
     </div>
   );
