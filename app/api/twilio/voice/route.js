@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
 import twilio from 'twilio';
 import { getBusinessByTwilioPhone, getAllBusinesses } from '@/lib/supabase';
 import { getBaseUrl } from '@/lib/config';
 import { normalizePhoneNumber } from '@/lib/phone';
+import { twimlError, twimlResponse } from '@/lib/twiml-error';
 
 async function resolveBusinessId(incomingTo) {
   const normalizedTo = normalizePhoneNumber(incomingTo);
@@ -52,14 +52,10 @@ export async function POST(request) {
       trim: 'trim-silence',
     });
 
-    return new NextResponse(twiml.toString(), {
-      status: 200,
-      headers: { 'Content-Type': 'text/xml' },
-    });
+    return twimlResponse(twiml.toString());
   } catch (err) {
-    return NextResponse.json(
-      { error: true, message: err.message },
-      { status: 500 },
+    return twimlResponse(
+      twimlError(err.message || 'Sorry, we could not connect your call.'),
     );
   }
 }
