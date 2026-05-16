@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { CallRow } from '@/lib/call-stats';
 import { maskPhone } from '@/lib/call-stats';
+import CallAudioListenButton from '../CallAudioListenButton';
 import { sentimentClass } from './sentiment-utils';
 
 export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
@@ -32,7 +33,8 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
                   <th className="pb-2 pr-4 font-medium">Caller</th>
                   <th className="pb-2 pr-4 font-medium">Intent</th>
                   <th className="pb-2 pr-4 font-medium">Sentiment</th>
-                  <th className="pb-2 font-medium">Status</th>
+                  <th className="pb-2 pr-4 font-medium">Status</th>
+                  <th className="pb-2 font-medium">Audio</th>
                 </tr>
               </thead>
               <tbody>
@@ -56,7 +58,7 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
                         {call.sentiment_label ?? '—'}
                       </span>
                     </td>
-                    <td className="py-2.5">
+                    <td className="py-2.5 pr-4">
                       {call.escalated ? (
                         <span className="text-xs text-amber-600 dark:text-amber-400">
                           Escalated
@@ -64,6 +66,9 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
                       ) : (
                         <span className="text-xs text-zinc-400">OK</span>
                       )}
+                    </td>
+                    <td className="py-2.5" onClick={(e) => e.stopPropagation()}>
+                      <CallAudioListenButton audio_base64={call.audio_base64} />
                     </td>
                   </tr>
                 ))}
@@ -123,6 +128,9 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
                 <p className="rounded-lg bg-teal-50 p-3 dark:bg-teal-950/40">
                   {selected.agent_response}
                 </p>
+                <div className="mt-2">
+                  <CallAudioListenButton audio_base64={selected.audio_base64} />
+                </div>
               </div>
             </div>
           </div>

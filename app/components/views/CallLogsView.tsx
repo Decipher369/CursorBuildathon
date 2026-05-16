@@ -8,6 +8,7 @@ import {
   formatDuration,
   maskPhone,
 } from '@/lib/call-stats';
+import CallAudioListenButton from '../CallAudioListenButton';
 import { sentimentClass } from '../dashboard/sentiment-utils';
 import { useCalls } from '../hooks/useCalls';
 
@@ -67,6 +68,7 @@ export default function CallLogsView({ business }: { business: Business }) {
                     <th className="px-5 py-3 font-medium">Duration</th>
                     <th className="px-5 py-3 font-medium">Sentiment</th>
                     <th className="px-5 py-3 font-medium">Summary</th>
+                    <th className="px-5 py-3 font-medium">Audio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -92,6 +94,9 @@ export default function CallLogsView({ business }: { business: Business }) {
                       </td>
                       <td className="max-w-xs truncate px-5 py-3.5 text-slate-600">
                         {callSummary(call)}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <CallAudioListenButton audio_base64={call.audio_base64} />
                       </td>
                     </tr>
                   ))}
@@ -147,6 +152,9 @@ export default function CallLogsView({ business }: { business: Business }) {
               <p className="rounded-xl rounded-br-sm bg-teal-600 p-3 text-sm text-white">
                 {selected.agent_response || '—'}
               </p>
+              <div className="mt-2">
+                <CallAudioListenButton audio_base64={selected.audio_base64} />
+              </div>
             </div>
           </div>
         </aside>

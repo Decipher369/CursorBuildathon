@@ -6,6 +6,7 @@ export type CallRow = {
   sentiment_score?: number;
   intent?: string;
   agent_response?: string;
+  audio_base64?: string | null;
   escalated?: boolean;
   duration_seconds?: number;
   created_at: string;
