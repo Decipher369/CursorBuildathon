@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
 import axios from 'axios';
 import twilio from 'twilio';
 import { transcribeAudio, analyzeSentiment } from '@/lib/valsea';
 import { getBaseUrl } from '@/lib/config';
+import { uploadCallAudio } from '@/lib/audio-storage';
+import { twimlError, twimlResponse } from '@/lib/twiml-error';
 
 export async function POST(request) {
   try {
@@ -46,20 +47,38 @@ export async function POST(request) {
       { headers: { 'Content-Type': 'application/json' } },
     );
 
-    const { audio_base64 } = processResponse.data;
+    if (processResponse.status < 200 || processResponse.status >= 300) {
+      throw new Error(
+        processResponse.data?.message || 'Call processing failed',
+      );
+    }
+
+    const { audio_base64, response: responseText } = processResponse.data;
 
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const twiml = new VoiceResponse();
-    twiml.play(`data:audio/mpeg;base64,${audio_base64}`);
 
-    return new NextResponse(twiml.toString(), {
-      status: 200,
-      headers: { 'Content-Type': 'text/xml' },
-    });
+    if (audio_base64) {
+      try {
+        const audioUrl = await uploadCallAudio(audio_base64);
+        twiml.play(audioUrl);
+      } catch {
+        const fallback =
+          typeof responseText === 'string' && responseText
+            ? responseText
+            : 'Thank you for calling. We will get back to you shortly.';
+        twiml.say({ voice: 'alice' }, fallback.slice(0, 500));
+      }
+    } else if (responseText) {
+      twiml.say({ voice: 'alice' }, String(responseText).slice(0, 500));
+    } else {
+      twiml.say({ voice: 'alice' }, 'Thank you for calling.');
+    }
+
+    return twimlResponse(twiml.toString());
   } catch (err) {
-    return NextResponse.json(
-      { error: true, message: err.message },
-      { status: 500 },
+    return twimlResponse(
+      twimlError(err.message || 'Sorry, we could not process your call.'),
     );
   }
 }

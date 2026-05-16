@@ -44,15 +44,17 @@ Caller / Dashboard simulate
 | Customer memory context | Done | Returning callers, call count |
 | Twilio inbound voice | Done | Record → process → TwiML play |
 | Onboarding UI (one business) | Done | `/onboarding` |
-| Dashboard UI | Done | Simulate call, history, webhook URL |
-| Dynamic routes (no redirect loop) | Done | `force-dynamic` on `/` and `/dashboard` |
+| Business summary dashboard | Done | `/dashboard` — KPIs, charts, recent calls |
+| Test agent / simulate | Done | `/demo` — text + audio simulate |
+| Dynamic routes (no redirect loop) | Done | `force-dynamic` on `/`, `/dashboard`, `/demo` |
+| Inbound call audio (Vercel Blob) | Done | Twilio `play` public URL; Say fallback |
 | Supabase Auth + per-user RLS | Not started | MVP uses open anon policies or service role |
 | Nasiko integration | Deferred | — |
-| Public audio URL for Twilio Play | Partial | Uses `data:audio/mpeg;base64` — may need hosted URL |
+| Public audio URL for Twilio Play | Done | Vercel Blob + Say fallback |
 | Multi-business admin | Not started | API blocks second business |
 | SMS / Messaging webhooks | Not started | Voice only |
 
-**Rough completion:** ~85% of planned MVP backend + UI; auth and Nasiko remain out of scope for the hackathon demo.
+**Rough completion:** ~90% of planned MVP; auth and Nasiko remain out of scope for the hackathon demo.
 
 ---
 
@@ -62,7 +64,8 @@ Caller / Dashboard simulate
 |-------|-------------|
 | `/` | Redirects to `/onboarding` or `/dashboard` |
 | `/onboarding` | Create one business + assign Twilio number (E.164) |
-| `/dashboard` | Simulate calls, view history, copy voice webhook URL |
+| `/dashboard` | Business overview — KPIs, charts, recent calls, needs attention |
+| `/demo` | Test agent — simulate text/audio calls; optional Twilio reference |
 
 ---
 
@@ -92,28 +95,13 @@ npm install
 
 ### 2. Environment variables
 
-Copy `.env.local` (not committed). Required:
+Copy [`.env.example`](.env.example) to `.env.local` and fill in values. Required:
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-OPENAI_API_KEY=
-ELEVENLABS_API_KEY=
-ELEVENLABS_VOICE_ID=
-VALSEA_API_KEY=
-VALSEA_API_URL=
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_PHONE_NUMBER=
-NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
-```
+- Supabase, OpenAI, ElevenLabs, VALSEA (`VALSEA_API_URL` or per-endpoint URLs)
+- Twilio credentials + `NEXT_PUBLIC_APP_URL`
+- `BLOB_READ_WRITE_TOKEN` — create a Blob store in Vercel for inbound call audio
 
-Optional:
-
-```env
-SUPABASE_SERVICE_ROLE_KEY=   # server-only; bypasses RLS (preferred over open anon policies)
-DEFAULT_BUSINESS_ID=         # fallback if Twilio To doesn't match a row
-```
+Optional: `SUPABASE_SERVICE_ROLE_KEY`, `DEFAULT_BUSINESS_ID`
 
 ### 3. Supabase migrations
 
@@ -135,7 +123,7 @@ On your number → **Voice** → **A call comes in**:
 npm run dev
 ```
 
-Open http://localhost:3000 → complete onboarding → dashboard.
+Open http://localhost:3000 → onboarding → **dashboard** (overview). Use **Test agent** (`/demo`) to simulate calls.
 
 ```bash
 npm run build   # verify production build
@@ -156,8 +144,11 @@ npm run build   # verify production build
 ```
 app/
   onboarding/page.tsx      # Business setup
-  dashboard/page.tsx       # Main UI (server, dynamic)
-  components/Dashboard.tsx # Client dashboard
+  dashboard/page.tsx       # Overview (server, dynamic)
+  demo/page.tsx            # Test agent (server, dynamic)
+  components/Dashboard.tsx # Summary charts + KPIs
+  components/DemoPanel.tsx # Simulate calls
+  components/dashboard/    # KPI cards, charts, tables
   api/                     # Route handlers
 lib/
   supabase.js              # DB access
