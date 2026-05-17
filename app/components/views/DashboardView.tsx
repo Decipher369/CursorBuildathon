@@ -64,11 +64,11 @@ function StatCard({
             <span className="text-2xl font-bold tracking-tight text-white md:text-[26px]">
               <AnimatedNumber value={value} suffix={suffix ?? ''} prefix={prefix ?? ''} />
             </span>
-            {delta && (
+        {delta && (
               <span className="text-sm font-bold" style={{ color: deltaPositive ? '#01B574' : '#f5576c' }}>
-                {delta}
-              </span>
-            )}
+            {delta}
+          </span>
+        )}
           </p>
         </div>
         <div
@@ -179,7 +179,7 @@ function HeroCard({ businessName, twilioPhone }: { businessName: string; twilioP
             }}
           >
             <IconArrowRight className="h-3.5 w-3.5" />
-          </span>
+    </span>
         </Link>
       </div>
     </motion.div>
@@ -504,8 +504,8 @@ export default function DashboardView({ business }: { business: Business }) {
           <div className="relative">
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={callsByDay} margin={{ top: 10, right: 12, bottom: 0, left: -18 }}>
-                <defs>
-                  <linearGradient id="callGrad" x1="0" y1="0" x2="0" y2="1">
+              <defs>
+                <linearGradient id="callGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#21D4FD" stopOpacity={0.85} />
                     <stop offset="50%" stopColor="#21D4FD" stopOpacity={0.4} />
                     <stop offset="100%" stopColor="#21D4FD" stopOpacity={0} />
@@ -513,7 +513,7 @@ export default function DashboardView({ business }: { business: Business }) {
                   <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="0">
                     <stop offset="0%" stopColor="#21D4FD" />
                     <stop offset="100%" stopColor="#7CF7FF" />
-                  </linearGradient>
+                </linearGradient>
                   <filter id="lineGlow" x="-50%" y="-50%" width="200%" height="200%">
                     <feGaussianBlur stdDeviation="2.5" result="blur" />
                     <feMerge>
@@ -521,7 +521,7 @@ export default function DashboardView({ business }: { business: Business }) {
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
-                </defs>
+              </defs>
 
                 <CartesianGrid
                   strokeDasharray="4 4"
@@ -551,13 +551,13 @@ export default function DashboardView({ business }: { business: Business }) {
                 />
 
                 {/* Single series: total calls per day */}
-                <Area
-                  type="monotone"
-                  dataKey="count"
+              <Area
+                type="monotone"
+                dataKey="count"
                   name="Calls"
                   stroke="url(#strokeGrad)"
                   strokeWidth={3.5}
-                  fill="url(#callGrad)"
+                fill="url(#callGrad)"
                   dot={false}
                   activeDot={{
                     fill: '#fff',
@@ -566,12 +566,12 @@ export default function DashboardView({ business }: { business: Business }) {
                     strokeWidth: 3,
                     filter: 'drop-shadow(0 0 8px rgba(33,212,253,0.9))',
                   }}
-                  isAnimationActive
+                isAnimationActive
                   animationDuration={1500}
                   filter="url(#lineGlow)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+              />
+            </AreaChart>
+          </ResponsiveContainer>
           </div>
         </motion.div>
 
@@ -744,19 +744,19 @@ export default function DashboardView({ business }: { business: Business }) {
                       <span className="truncate text-[11px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
                         {call.intent ?? '—'}
                       </span>
-                    </div>
+                  </div>
                     {/* Resolution bar */}
                     <div className="col-span-3">
                       <div className="mb-1 text-[11px] font-bold" style={{ color: '#fff' }}>{pct}%</div>
                       <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
                         <motion.div className="h-full rounded-full"
                           style={{ background: `linear-gradient(90deg, ${barColor}, ${barColor}99)` }}
-                          initial={{ width: 0 }}
+                      initial={{ width: 0 }}
                           animate={{ width: `${pct}%` }}
                           transition={{ delay: 0.6 + i * 0.05, duration: 0.8, ease: 'easeOut' }}
-                        />
-                      </div>
-                    </div>
+                    />
+                  </div>
+                </div>
                   </motion.div>
                 );
               })}
