@@ -165,6 +165,25 @@ function SignInForm() {
             )}
           </AnimatePresence>
 
+          {/* Demo credentials hint */}
+          <div
+            className="mb-5 rounded-xl px-4 py-3"
+            style={{
+              background: 'rgba(79,172,254,0.08)',
+              border: '1px solid rgba(79,172,254,0.2)',
+            }}
+          >
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(79,172,254,0.7)' }}>
+              Demo credentials
+            </p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              Email: <span className="font-mono text-white">kshagash@gmail.com</span>
+            </p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              Password: <span className="font-mono text-white">123456</span>
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
