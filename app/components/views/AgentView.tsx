@@ -83,14 +83,11 @@ export default function AgentView({
       let data = await res.json();
 
       if (!res.ok && data.message?.includes('agent_name')) {
-        const fallback = { ...payload };
-        delete fallback.agent_name;
-        delete fallback.persona;
-        delete fallback.escalation_phone;
+        const { agent_name: _a, persona: _p, escalation_phone: _e, ...fallback } = payload;
         res = await fetch(`/api/businesses/${business.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(fallback),
+          body: JSON.stringify({ ...fallback }),
         });
         data = await res.json();
       }
