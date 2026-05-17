@@ -1,10 +1,9 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useState } from 'react';
 import type { AppView, Business } from '@/lib/business-types';
-import { APP_PREFETCH_HREFS } from '@/lib/app-prefetch';
 import AppShell from './AppShell';
 import AgentView from './views/AgentView';
 import CallLogsView from './views/CallLogsView';
@@ -17,7 +16,7 @@ const AdminView = dynamic(() => import('./views/AdminView'), {
       className="flex min-h-[50vh] items-center justify-center text-sm"
       style={{ color: 'rgba(255,255,255,0.5)' }}
     >
-      Loading Test Agent…
+      Loading…
     </div>
   ),
 });
@@ -30,12 +29,10 @@ const viewPaths: Record<AppView, string> = {
   admin: '/admin',
 };
 
-const pathToView: Record<string, AppView> = {
-  '/dashboard': 'dashboard',
-  '/call-logs': 'call-logs',
-  '/agent': 'agent',
-  '/settings': 'settings',
-  '/admin': 'admin',
+const viewVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -6 },
 };
 
 export default function CallSenseApp({
@@ -45,31 +42,17 @@ export default function CallSenseApp({
   business: Business;
   initialView?: AppView;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
+  const [view, setView] = useState<AppView>(initialView);
   const [business, setBusiness] = useState(initialBusiness);
 
-  const view = useMemo(
-    () => pathToView[pathname] ?? initialView,
-    [pathname, initialView],
-  );
-
-  const onNavigate = useCallback(
-    (next: AppView) => {
-      router.push(viewPaths[next]);
-    },
-    [router],
-  );
-
-  useEffect(() => {
-    APP_PREFETCH_HREFS.forEach((href) => {
-      try {
-        router.prefetch(href);
-      } catch {
-        /* ignore */
-      }
-    });
-  }, [router]);
+  // Instant client-side switch — no server round-trip
+  const onNavigate = useCallback((next: AppView) => {
+    setView(next);
+    // Keep URL in sync for browser history / deep links without triggering navigation
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', viewPaths[next]);
+    }
+  }, []);
 
   const onSaved = useCallback((updated: Business) => {
     setBusiness(updated);
@@ -77,11 +60,22 @@ export default function CallSenseApp({
 
   return (
     <AppShell business={business} activeView={view} onNavigate={onNavigate}>
-      {view === 'dashboard' && <DashboardView business={business} />}
-      {view === 'call-logs' && <CallLogsView business={business} />}
-      {view === 'agent' && <AgentView business={business} onSaved={onSaved} />}
-      {view === 'settings' && <SettingsView business={business} onSaved={onSaved} />}
-      {view === 'admin' && <AdminView business={business} />}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={view}
+          variants={viewVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {view === 'dashboard' && <DashboardView business={business} />}
+          {view === 'call-logs' && <CallLogsView business={business} />}
+          {view === 'agent' && <AgentView business={business} onSaved={onSaved} />}
+          {view === 'settings' && <SettingsView business={business} onSaved={onSaved} />}
+          {view === 'admin' && <AdminView business={business} />}
+        </motion.div>
+      </AnimatePresence>
     </AppShell>
   );
 }

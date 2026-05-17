@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -99,9 +100,19 @@ export default function OnboardingPage() {
           style={{ width: 700, height: 500, background: 'radial-gradient(ellipse, rgba(79,172,254,0.08) 0%, transparent 70%)', filter: 'blur(60px)' }} />
       </div>
 
-      <div className="relative mx-auto max-w-lg px-4 py-12 sm:px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="relative mx-auto max-w-lg px-4 py-12 sm:px-6"
+      >
         {/* Header */}
-        <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="mb-8"
+        >
           <div className="mb-4 flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl text-sm font-black text-white"
               style={{ background: 'linear-gradient(135deg, #4facfe 0%, #007bff 100%)' }}>
@@ -114,15 +125,26 @@ export default function OnboardingPage() {
           <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
             Link your Twilio number so inbound calls route to your AI agent correctly.
           </p>
-        </div>
+        </motion.div>
 
-        {error && (
-          <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-            {error}
-          </div>
-        )}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-4 overflow-hidden rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <form onSubmit={handleSubmit} className="rounded-2xl p-6 space-y-4" style={{ background: 'rgba(12,16,42,0.82)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 12px 40px rgba(0,0,0,0.35)' }}>
+        <motion.form
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          onSubmit={handleSubmit} className="rounded-2xl p-6 space-y-4" style={{ background: 'rgba(12,16,42,0.82)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 12px 40px rgba(0,0,0,0.35)' }}>
           <div>
             <label className={labelCls} style={labelStyle}>Business name</label>
             <input className={fieldCls} style={fieldStyle} value={name} onChange={(e) => setName(e.target.value)} placeholder="Laksa House" required />
@@ -190,8 +212,8 @@ export default function OnboardingPage() {
               </span>
             ) : 'Create Business →'}
           </button>
-        </form>
-      </div>
+        </motion.form>
+      </motion.div>
     </div>
   );
 }

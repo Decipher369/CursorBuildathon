@@ -1,5 +1,14 @@
 import Link from 'next/link';
 import { getAllBusinesses } from '@/lib/supabase';
+import {
+  FadeUp,
+  FloatingBadge,
+  HeroEntrance,
+  MockupEntrance,
+  NavEntrance,
+  StaggerItem,
+  StaggerList,
+} from '@/app/components/LandingAnimations';
 
 export const dynamic = 'force-dynamic';
 
@@ -126,44 +135,46 @@ export default async function HomePage() {
     <div className="min-h-screen bg-[#0a1430] text-white font-sans overflow-x-hidden">
 
       {/* ── NAVBAR ────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-[#0a1430]/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-6 flex items-center justify-between h-16">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#4facfe] to-[#007bff] text-sm font-black text-white">
-              CS
-            </span>
-            <span className="text-lg font-bold tracking-tight">CallSense</span>
-          </div>
+      <NavEntrance className="fixed top-0 inset-x-0 z-50">
+        <nav className="border-b border-white/5 bg-[#0a1430]/80 backdrop-blur-xl">
+          <div className="mx-auto max-w-7xl px-6 flex items-center justify-between h-16">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#4facfe] to-[#007bff] text-sm font-black text-white">
+                CS
+              </span>
+              <span className="text-lg font-bold tracking-tight">CallSense</span>
+            </div>
 
-          <div className="hidden md:flex items-center gap-8">
-            {[
-              { label: 'Features', href: '#features' },
-              { label: 'How it Works', href: '#how-it-works' },
-              { label: 'Pricing', href: '#pricing' },
-            ].map(({ label, href }) => (
-              <a key={label} href={href}
-                className="text-sm text-slate-400 hover:text-white transition-colors">
-                {label}
-              </a>
-            ))}
-          </div>
+            <div className="hidden md:flex items-center gap-8">
+              {[
+                { label: 'Features', href: '#features' },
+                { label: 'How it Works', href: '#how-it-works' },
+                { label: 'Pricing', href: '#pricing' },
+              ].map(({ label, href }) => (
+                <a key={label} href={href}
+                  className="text-sm text-slate-400 hover:text-white transition-colors">
+                  {label}
+                </a>
+              ))}
+            </div>
 
-          <div className="flex items-center gap-3">
-            {hasApp && (
-              <Link href="/dashboard"
-                className="hidden sm:flex items-center gap-1.5 text-sm text-[#4facfe] hover:text-[#93c5fd] transition-colors font-medium">
-                {businessName && <span className="max-w-[120px] truncate text-slate-400">{businessName}</span>}
-                <span>Dashboard</span>
-                <ArrowRightIcon className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-3">
+              {hasApp && (
+                <Link href="/dashboard"
+                  className="hidden sm:flex items-center gap-1.5 text-sm text-[#4facfe] hover:text-[#93c5fd] transition-colors font-medium">
+                  {businessName && <span className="max-w-[120px] truncate text-slate-400">{businessName}</span>}
+                  <span>Dashboard</span>
+                  <ArrowRightIcon className="h-3.5 w-3.5" />
+                </Link>
+              )}
+              <Link href={ctaHref}
+                className="rounded-lg bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-4 py-2 text-sm font-semibold text-[#060818] hover:opacity-90 transition-all">
+                {hasApp ? 'Open App' : 'Get Started'}
               </Link>
-            )}
-            <Link href={ctaHref}
-              className="rounded-lg bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-4 py-2 text-sm font-semibold text-[#060818] hover:opacity-90 transition-all">
-              {hasApp ? 'Open App' : 'Get Started'}
-            </Link>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </NavEntrance>
 
       {/* ── HERO ──────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center pt-16">
@@ -174,7 +185,7 @@ export default async function HomePage() {
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">
-          <div>
+          <HeroEntrance>
             <div className="inline-flex items-center gap-2 rounded-full border border-[#4facfe]/30 bg-[#4facfe]/10 px-4 py-1.5 text-xs font-medium text-[#4facfe] mb-6">
               <span className="h-1.5 w-1.5 rounded-full bg-[#4facfe] animate-pulse" />
               Live AI Agents · Powered by Valsea
@@ -227,10 +238,10 @@ export default async function HomePage() {
                 <p className="text-xs text-slate-500">Trusted by 500+ businesses in SEA</p>
               </div>
             </div>
-          </div>
+          </HeroEntrance>
 
           {/* Phone mockup */}
-          <div className="relative flex justify-center lg:justify-end">
+          <MockupEntrance className="relative flex justify-center lg:justify-end">
             <div className="relative w-72">
               <div className="rounded-[2.5rem] border border-white/10 bg-gradient-to-b from-slate-800 to-slate-900 p-1.5 shadow-2xl shadow-black/60">
                 <div className="rounded-[2rem] bg-[#0d1117] overflow-hidden">
@@ -291,50 +302,56 @@ export default async function HomePage() {
                   </div>
                 </div>
               </div>
-              <div className="absolute -left-10 top-20 rounded-xl bg-[#0c1638]/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
-                <div className="text-[#4facfe] font-semibold">24/7 Active</div>
-                <div className="text-slate-500">Never misses a call</div>
-              </div>
-              <div className="absolute -right-8 bottom-24 rounded-xl bg-[#0c1638]/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
-                <div className="text-amber-400 font-semibold">98% Accuracy</div>
-                <div className="text-slate-500">SEA voices</div>
-              </div>
+              <FloatingBadge className="absolute -left-10 top-20">
+                <div className="rounded-xl bg-[#0c1638]/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
+                  <div className="text-[#4facfe] font-semibold">24/7 Active</div>
+                  <div className="text-slate-500">Never misses a call</div>
+                </div>
+              </FloatingBadge>
+              <FloatingBadge className="absolute -right-8 bottom-24">
+                <div className="rounded-xl bg-[#0c1638]/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
+                  <div className="text-amber-400 font-semibold">98% Accuracy</div>
+                  <div className="text-slate-500">SEA voices</div>
+                </div>
+              </FloatingBadge>
             </div>
-          </div>
+          </MockupEntrance>
         </div>
       </section>
 
       {/* ── LOGOS ─────────────────────────────────────────────────── */}
-      <section className="border-y border-white/5 py-12 bg-white/[0.02]">
-        <div className="mx-auto max-w-5xl px-6">
-          <p className="text-center text-xs font-medium uppercase tracking-widest text-slate-600 mb-8">
-            Powered by
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
-            {[
-              { name: 'OpenAI', symbol: '⬛' },
-              { name: 'Valsea', symbol: '◆' },
-              { name: 'Supabase', symbol: '⚡' },
-              { name: 'Twilio', symbol: '●' },
-            ].map(({ name, symbol }) => (
-              <div key={name}
-                className="text-slate-600 font-bold text-xl tracking-tight hover:text-slate-400 transition-colors select-none">
-                {symbol} {name}
-              </div>
-            ))}
+      <FadeUp>
+        <section className="border-y border-white/5 py-12 bg-white/[0.02]">
+          <div className="mx-auto max-w-5xl px-6">
+            <p className="text-center text-xs font-medium uppercase tracking-widest text-slate-600 mb-8">
+              Powered by
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
+              {[
+                { name: 'OpenAI', symbol: '⬛' },
+                { name: 'Valsea', symbol: '◆' },
+                { name: 'Supabase', symbol: '⚡' },
+                { name: 'Twilio', symbol: '●' },
+              ].map(({ name, symbol }) => (
+                <div key={name}
+                  className="text-slate-600 font-bold text-xl tracking-tight hover:text-slate-400 transition-colors select-none">
+                  {symbol} {name}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </FadeUp>
 
       {/* ── HOW IT WORKS ──────────────────────────────────────────── */}
       <section id="how-it-works" className="py-28">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-16">
+          <FadeUp className="text-center mb-16">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Simple Process</p>
             <h2 className="text-4xl font-black tracking-tight">Up and running in 2 steps</h2>
             <p className="mt-3 text-slate-400 max-w-md mx-auto">From zero to a live AI call center agent in under 5 minutes.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          </FadeUp>
+          <StaggerList className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {[
               {
                 step: '01', title: 'We Build Your Agent',
@@ -351,36 +368,38 @@ export default async function HomePage() {
                 link: hasApp ? '/call-logs' : null, linkLabel: 'View call logs →',
               },
             ].map(({ step, title, desc, Icon, gradient, border, iconColor, link, linkLabel }) => (
-              <div key={step}
-                className={`relative rounded-2xl border ${border} bg-gradient-to-b ${gradient} p-8 hover:scale-[1.02] transition-transform`}>
-                <div className="text-xs font-black tracking-widest text-slate-600 mb-4">{step}</div>
-                <div className="mb-4 h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center">
-                  <Icon className={`h-6 w-6 ${iconColor}`} />
+              <StaggerItem key={step}>
+                <div
+                  className={`relative rounded-2xl border ${border} bg-gradient-to-b ${gradient} p-8 hover:scale-[1.02] transition-transform`}>
+                  <div className="text-xs font-black tracking-widest text-slate-600 mb-4">{step}</div>
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center">
+                    <Icon className={`h-6 w-6 ${iconColor}`} />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">{title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed mb-4">{desc}</p>
+                  {link && (
+                    <Link href={link} className={`text-xs font-semibold ${iconColor} hover:opacity-80 transition-opacity`}>
+                      {linkLabel}
+                    </Link>
+                  )}
                 </div>
-                <h3 className="text-xl font-bold mb-2">{title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed mb-4">{desc}</p>
-                {link && (
-                  <Link href={link} className={`text-xs font-semibold ${iconColor} hover:opacity-80 transition-opacity`}>
-                    {linkLabel}
-                  </Link>
-                )}
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerList>
         </div>
       </section>
 
       {/* ── FEATURES ──────────────────────────────────────────────── */}
       <section id="features" className="py-28 bg-white/[0.015]">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-16">
+          <FadeUp className="text-center mb-16">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Everything You Need</p>
             <h2 className="text-4xl font-black tracking-tight">Built for real businesses</h2>
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               Enterprise-grade AI calling, designed for Southeast Asia.
             </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          </FadeUp>
+          <StaggerList className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
               { Icon: GlobeIcon, title: 'Understands Any Accent', tag: 'Valsea AI',
                 desc: 'Powered by Valsea — trained specifically for Southeast Asian voices, Singlish, and regional dialects.' },
@@ -395,30 +414,32 @@ export default async function HomePage() {
               { Icon: ZapIcon, title: 'Easy Setup', tag: 'No-code',
                 desc: "No code, no technical knowledge, no IT team. You're live in minutes with a single phone call." },
             ].map(({ Icon, title, desc, tag }) => (
-              <div key={title}
-                className="group rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 hover:border-[#4facfe]/40 hover:bg-[#4facfe]/5 transition-all cursor-default">
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="h-11 w-11 rounded-xl bg-[#4facfe]/10 flex items-center justify-center group-hover:bg-[#4facfe]/20 transition-colors">
-                    <Icon className="h-5 w-5 text-[#4facfe]" />
+              <StaggerItem key={title}>
+                <div
+                  className="group rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 hover:border-[#4facfe]/40 hover:bg-[#4facfe]/5 transition-all cursor-default">
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="h-11 w-11 rounded-xl bg-[#4facfe]/10 flex items-center justify-center group-hover:bg-[#4facfe]/20 transition-colors">
+                      <Icon className="h-5 w-5 text-[#4facfe]" />
+                    </div>
+                    <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] font-medium text-slate-500">{tag}</span>
                   </div>
-                  <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] font-medium text-slate-500">{tag}</span>
+                  <h3 className="text-base font-bold mb-1.5">{title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
                 </div>
-                <h3 className="text-base font-bold mb-1.5">{title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerList>
         </div>
       </section>
 
       {/* ── USE CASES ─────────────────────────────────────────────── */}
       <section className="py-28">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-16">
+          <FadeUp className="text-center mb-16">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Use Cases</p>
             <h2 className="text-4xl font-black tracking-tight">Works for every business</h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          </FadeUp>
+          <StaggerList className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               { Icon: UtensilsIcon, title: 'Restaurants', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20',
                 desc: 'Handle reservations, takeaway orders, and opening hours automatically.' },
@@ -429,127 +450,137 @@ export default async function HomePage() {
               { Icon: TruckIcon, title: 'Logistics', color: 'text-sky-400', bg: 'bg-sky-500/10', border: 'border-sky-500/20',
                 desc: 'Track orders, handle delivery queries, and escalate issues in real time.' },
             ].map(({ Icon, title, desc, color, bg, border }) => (
-              <div key={title}
-                className={`rounded-2xl border ${border} ${bg} p-6 hover:scale-[1.03] transition-transform`}>
-                <div className="mb-4 h-12 w-12 rounded-xl bg-black/20 flex items-center justify-center">
-                  <Icon className={`h-6 w-6 ${color}`} />
+              <StaggerItem key={title}>
+                <div
+                  className={`rounded-2xl border ${border} ${bg} p-6 hover:scale-[1.03] transition-transform`}>
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-black/20 flex items-center justify-center">
+                    <Icon className={`h-6 w-6 ${color}`} />
+                  </div>
+                  <h3 className="text-base font-bold mb-1.5">{title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
                 </div>
-                <h3 className="text-base font-bold mb-1.5">{title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerList>
         </div>
       </section>
 
       {/* ── LIVE DEMO STRIP (only when app is set up) ─────────────── */}
       {hasApp && (
-        <section className="py-16 border-y border-[#4facfe]/15 bg-[#4facfe]/5">
-          <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#4facfe]/30 bg-[#4facfe]/10 px-3 py-1 text-xs font-medium text-[#4facfe] mb-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#4facfe] animate-pulse" />
-                Your agent is live
+        <FadeUp>
+          <section className="py-16 border-y border-[#4facfe]/15 bg-[#4facfe]/5">
+            <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#4facfe]/30 bg-[#4facfe]/10 px-3 py-1 text-xs font-medium text-[#4facfe] mb-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#4facfe] animate-pulse" />
+                  Your agent is live
+                </div>
+                <h3 className="text-2xl font-black">Try your AI agent right now</h3>
+                <p className="text-slate-400 text-sm mt-1">Simulate a call, review transcripts, and tune your agent — all from the dashboard.</p>
               </div>
-              <h3 className="text-2xl font-black">Try your AI agent right now</h3>
-              <p className="text-slate-400 text-sm mt-1">Simulate a call, review transcripts, and tune your agent — all from the dashboard.</p>
+              <div className="flex flex-wrap gap-3 shrink-0">
+                <Link href="/dashboard"
+                  className="rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-5 py-2.5 text-sm font-bold text-[#060818] hover:opacity-90 transition-colors shadow-lg shadow-[#4facfe]/25">
+                  Simulate a Call
+                </Link>
+                <Link href="/call-logs"
+                  className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold hover:bg-white/5 transition-colors">
+                  View Call Logs
+                </Link>
+                <Link href="/agent"
+                  className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold hover:bg-white/5 transition-colors">
+                  Configure Agent
+                </Link>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-3 shrink-0">
-              <Link href="/dashboard"
-                className="rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-5 py-2.5 text-sm font-bold text-[#060818] hover:opacity-90 transition-colors shadow-lg shadow-[#4facfe]/25">
-                Simulate a Call
-              </Link>
-              <Link href="/call-logs"
-                className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold hover:bg-white/5 transition-colors">
-                View Call Logs
-              </Link>
-              <Link href="/agent"
-                className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold hover:bg-white/5 transition-colors">
-                Configure Agent
-              </Link>
-            </div>
-          </div>
-        </section>
+          </section>
+        </FadeUp>
       )}
 
       {/* ── PRICING ───────────────────────────────────────────────── */}
       <section id="pricing" className="py-28 bg-white/[0.015]">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-16">
+          <FadeUp className="text-center mb-16">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Pricing</p>
             <h2 className="text-4xl font-black tracking-tight">Simple, transparent pricing</h2>
             <p className="mt-3 text-slate-400 text-lg">Start free. Scale when you&apos;re ready.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 flex flex-col">
-              <div className="mb-6">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">Starter</p>
-                <p className="text-4xl font-black">Free</p>
-                <p className="text-sm text-slate-500 mt-1">Forever free</p>
-              </div>
-              <ul className="space-y-3 flex-1 mb-8">
-                {['1 AI agent', '100 calls / month', 'Basic analytics', 'Email support'].map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm text-slate-400">
-                    <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
-                  </li>
-                ))}
-              </ul>
-              <Link href={ctaHref}
-                className="block text-center rounded-xl border border-white/15 py-3 text-sm font-semibold hover:bg-white/5 transition-colors">
-                {hasApp ? 'Open Dashboard' : 'Get Started Free'}
-              </Link>
-            </div>
-
-            <div className="relative rounded-2xl border-2 border-[#4facfe] bg-gradient-to-b from-[#4facfe]/10 to-transparent p-8 flex flex-col shadow-xl shadow-[#4facfe]/10">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-4 py-1 text-[11px] font-bold text-[#060818] uppercase tracking-wide">
-                Most Popular
-              </div>
-              <div className="mb-6">
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-2">Growth</p>
-                <div className="flex items-end gap-1">
-                  <p className="text-4xl font-black">$49</p>
-                  <p className="text-slate-400 mb-1">/mo</p>
+          </FadeUp>
+          <StaggerList className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <StaggerItem>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 flex flex-col h-full">
+                <div className="mb-6">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">Starter</p>
+                  <p className="text-4xl font-black">Free</p>
+                  <p className="text-sm text-slate-500 mt-1">Forever free</p>
                 </div>
-                <p className="text-sm text-slate-500 mt-1">Everything you need to scale</p>
+                <ul className="space-y-3 flex-1 mb-8">
+                  {['1 AI agent', '100 calls / month', 'Basic analytics', 'Email support'].map((f) => (
+                    <li key={f} className="flex items-center gap-3 text-sm text-slate-400">
+                      <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={ctaHref}
+                  className="block text-center rounded-xl border border-white/15 py-3 text-sm font-semibold hover:bg-white/5 transition-colors">
+                  {hasApp ? 'Open Dashboard' : 'Get Started Free'}
+                </Link>
               </div>
-              <ul className="space-y-3 flex-1 mb-8">
-                {['5 AI agents', 'Unlimited calls', 'Sentiment analysis', 'Call summaries', 'Priority support', 'Custom voice'].map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
-                  </li>
-                ))}
-              </ul>
-              <Link href={ctaHref}
-                className="block text-center rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] py-3 text-sm font-bold text-[#060818] hover:opacity-90 transition-colors shadow-lg shadow-[#4facfe]/30">
-                {hasApp ? 'Open Dashboard' : 'Start Free Trial'}
-              </Link>
-            </div>
+            </StaggerItem>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 flex flex-col">
-              <div className="mb-6">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">Enterprise</p>
-                <p className="text-4xl font-black">Custom</p>
-                <p className="text-sm text-slate-500 mt-1">For large organisations</p>
+            <StaggerItem>
+              <div className="relative rounded-2xl border-2 border-[#4facfe] bg-gradient-to-b from-[#4facfe]/10 to-transparent p-8 flex flex-col h-full shadow-xl shadow-[#4facfe]/10">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-4 py-1 text-[11px] font-bold text-[#060818] uppercase tracking-wide">
+                  Most Popular
+                </div>
+                <div className="mb-6">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-2">Growth</p>
+                  <div className="flex items-end gap-1">
+                    <p className="text-4xl font-black">$49</p>
+                    <p className="text-slate-400 mb-1">/mo</p>
+                  </div>
+                  <p className="text-sm text-slate-500 mt-1">Everything you need to scale</p>
+                </div>
+                <ul className="space-y-3 flex-1 mb-8">
+                  {['5 AI agents', 'Unlimited calls', 'Sentiment analysis', 'Call summaries', 'Priority support', 'Custom voice'].map((f) => (
+                    <li key={f} className="flex items-center gap-3 text-sm text-slate-300">
+                      <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={ctaHref}
+                  className="block text-center rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] py-3 text-sm font-bold text-[#060818] hover:opacity-90 transition-colors shadow-lg shadow-[#4facfe]/30">
+                  {hasApp ? 'Open Dashboard' : 'Start Free Trial'}
+                </Link>
               </div>
-              <ul className="space-y-3 flex-1 mb-8">
-                {['Unlimited agents', 'Custom voices', 'Dedicated support', 'SLA guarantee', 'On-premise option', 'White-label'].map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm text-slate-400">
-                    <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
-                  </li>
-                ))}
-              </ul>
-              <a href="mailto:hello@callsense.ai"
-                className="block text-center rounded-xl border border-white/15 py-3 text-sm font-semibold hover:bg-white/5 transition-colors">
-                Contact Sales
-              </a>
-            </div>
-          </div>
+            </StaggerItem>
+
+            <StaggerItem>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 flex flex-col h-full">
+                <div className="mb-6">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">Enterprise</p>
+                  <p className="text-4xl font-black">Custom</p>
+                  <p className="text-sm text-slate-500 mt-1">For large organisations</p>
+                </div>
+                <ul className="space-y-3 flex-1 mb-8">
+                  {['Unlimited agents', 'Custom voices', 'Dedicated support', 'SLA guarantee', 'On-premise option', 'White-label'].map((f) => (
+                    <li key={f} className="flex items-center gap-3 text-sm text-slate-400">
+                      <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
+                    </li>
+                  ))}
+                </ul>
+                <a href="mailto:hello@callsense.ai"
+                  className="block text-center rounded-xl border border-white/15 py-3 text-sm font-semibold hover:bg-white/5 transition-colors">
+                  Contact Sales
+                </a>
+              </div>
+            </StaggerItem>
+          </StaggerList>
         </div>
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="py-28">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+        <FadeUp className="mx-auto max-w-4xl px-6 text-center">
           <div className="relative rounded-3xl border border-[#4facfe]/20 bg-gradient-to-b from-[#4facfe]/10 to-transparent p-16 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#4facfe]/5 via-transparent to-[#007bff]/5 pointer-events-none" />
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#4facfe]/15 rounded-full blur-[80px] pointer-events-none" />
@@ -571,7 +602,7 @@ export default async function HomePage() {
               {hasApp ? 'Open Dashboard →' : 'Get Started Free →'}
             </Link>
           </div>
-        </div>
+        </FadeUp>
       </section>
 
       {/* ── FOOTER ────────────────────────────────────────────────── */}
