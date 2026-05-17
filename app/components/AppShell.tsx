@@ -12,7 +12,7 @@ import {
   IconSettings,
 } from './icons';
 
-const nav: { id: AppView; label: string; Icon: typeof IconDashboard }[] = [
+const nav: { id: Exclude<AppView, 'admin'>; label: string; Icon: typeof IconDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', Icon: IconDashboard },
   { id: 'agent', label: 'My Agent', Icon: IconAgent },
   { id: 'call-logs', label: 'Call Logs', Icon: IconCallLogs },
@@ -24,6 +24,7 @@ const VIEW_TITLES: Record<AppView, string> = {
   agent: 'My Agent',
   'call-logs': 'Call Logs',
   settings: 'Settings',
+  admin: 'Test Agent',
 };
 
 const SIDEBAR_BG = 'transparent';
@@ -197,26 +198,29 @@ export default function AppShell({
 
           {[
             { href: '/admin', label: 'Test Agent', Icon: IconFlask },
-          ].map(({ href, label, Icon }) => (
+          ].map(({ href, label, Icon }) => {
+            const activeTool = activeView === 'admin';
+            return (
             <Link
               key={href}
               href={href}
               prefetch
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
-                borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
-                color: '#fff', background: 'transparent', transition: 'background 0.2s',
+                borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: activeTool ? 600 : 500,
+                color: '#fff', background: activeTool ? NAV_ROW_ACTIVE_BG : 'transparent', transition: 'background 0.2s',
               }}
             >
               <span style={{
                 width: '36px', height: '36px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                background: NAV_ICON_TILE_INACTIVE,
+                background: activeTool ? NAV_ICON_ACTIVE : NAV_ICON_TILE_INACTIVE,
               }}>
-                <Icon style={{ width: '17px', height: '17px', color: NAV_ICON_INACTIVE_COLOR }} />
+                <Icon style={{ width: '17px', height: '17px', color: activeTool ? '#fff' : NAV_ICON_INACTIVE_COLOR }} />
               </span>
               {label}
             </Link>
-          ))}
+            );
+          })}
         </nav>
 
         {/* Promo card — Vision UI "Need help?" mesh gradient */}

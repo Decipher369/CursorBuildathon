@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import AdminView from '@/app/components/views/AdminView';
+import CallSenseApp from '@/app/components/CallSenseApp';
 import { getAllBusinesses } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -16,5 +16,5 @@ export default async function AdminPage() {
     redirect('/onboarding');
   }
 
-  return <AdminView business={businesses[0]} />;
+  return <CallSenseApp business={businesses[0]} initialView="admin" />;
 }

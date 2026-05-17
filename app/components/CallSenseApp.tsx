@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AppView, Business } from '@/lib/business-types';
@@ -10,11 +11,23 @@ import CallLogsView from './views/CallLogsView';
 import DashboardView from './views/DashboardView';
 import SettingsView from './views/SettingsView';
 
+const AdminView = dynamic(() => import('./views/AdminView'), {
+  loading: () => (
+    <div
+      className="flex min-h-[50vh] items-center justify-center text-sm"
+      style={{ color: 'rgba(255,255,255,0.5)' }}
+    >
+      Loading Test Agent…
+    </div>
+  ),
+});
+
 const viewPaths: Record<AppView, string> = {
   dashboard: '/',
   'call-logs': '/call-logs',
   agent: '/agent',
   settings: '/settings',
+  admin: '/admin',
 };
 
 const pathToView: Record<string, AppView> = {
@@ -23,6 +36,7 @@ const pathToView: Record<string, AppView> = {
   '/call-logs': 'call-logs',
   '/agent': 'agent',
   '/settings': 'settings',
+  '/admin': 'admin',
 };
 
 export default function CallSenseApp({
@@ -68,6 +82,7 @@ export default function CallSenseApp({
       {view === 'call-logs' && <CallLogsView business={business} />}
       {view === 'agent' && <AgentView business={business} onSaved={onSaved} />}
       {view === 'settings' && <SettingsView business={business} />}
+      {view === 'admin' && <AdminView business={business} />}
     </AppShell>
   );
 }

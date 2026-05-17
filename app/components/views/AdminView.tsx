@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Business } from '@/lib/business-types';
 import { useCalls } from '../hooks/useCalls';
-import PrefetchAppRoutes from '../PrefetchAppRoutes';
 
 type ProcessResult = {
   call_id: string;
@@ -190,7 +189,6 @@ export default function AdminView({ business }: { business: Business }) {
 
   return (
     <div className="min-h-full p-6 text-slate-100">
-      <PrefetchAppRoutes />
       {/* Hero header with cosmic background */}
       <div
         className="relative mb-8 overflow-hidden rounded-3xl"
