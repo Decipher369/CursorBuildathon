@@ -12,4 +12,4 @@ export type Business = {
   escalation_phone?: string;
 };
 
-export type AppView = 'dashboard' | 'call-logs' | 'agent' | 'settings';
+export type AppView = 'dashboard' | 'call-logs' | 'agent' | 'settings' | 'admin';

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { CallRow } from '@/lib/call-stats';
 import { maskPhone } from '@/lib/call-stats';
@@ -29,9 +30,9 @@ export default function RecentCallsTable({ calls }: { calls: CallRow[] }) {
         {recent.length === 0 ? (
           <p className="text-sm text-zinc-500">
             No calls yet. Use{' '}
-            <a href="/admin" className="text-teal-600 underline dark:text-teal-400">
+            <Link href="/admin" prefetch className="text-teal-600 underline dark:text-teal-400">
               Test agent
-            </a>{' '}
+            </Link>{' '}
             to simulate one.
           </p>
         ) : (

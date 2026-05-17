@@ -1,20 +1,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AppView, Business } from '@/lib/business-types';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
+import Link from 'next/link';
 import {
   IconAgent,
-  IconBarChart,
   IconCallLogs,
   IconDashboard,
   IconFlask,
-  IconHeadphones,
   IconSettings,
 } from './icons';
 
-const nav: { id: AppView; label: string; Icon: typeof IconDashboard }[] = [
+const nav: { id: Exclude<AppView, 'admin'>; label: string; Icon: typeof IconDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', Icon: IconDashboard },
   { id: 'agent', label: 'My Agent', Icon: IconAgent },
   { id: 'call-logs', label: 'Call Logs', Icon: IconCallLogs },
@@ -26,7 +25,15 @@ const VIEW_TITLES: Record<AppView, string> = {
   agent: 'My Agent',
   'call-logs': 'Call Logs',
   settings: 'Settings',
+  admin: 'Test Agent',
 };
+
+const SIDEBAR_BG = 'transparent';
+const NAV_ROW_ACTIVE_BG = '#1a1f37';
+const NAV_ICON_TILE_INACTIVE = '#1a1f37';
+const NAV_ICON_ACTIVE = '#007bff';
+const NAV_ICON_INACTIVE_COLOR = '#3182ce';
+const TOPBAR_SCROLL_THRESHOLD = 8;
 
 export default function AppShell({
   business,
@@ -41,6 +48,8 @@ export default function AppShell({
 }) {
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const [topBarFloated, setTopBarFloated] = useState(false);
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -50,6 +59,17 @@ export default function AppShell({
     router.refresh();
   }
 
+  const onMainScroll = useCallback(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    setTopBarFloated(el.scrollTop > TOPBAR_SCROLL_THRESHOLD);
+  }, []);
+
+  useEffect(() => {
+    const el = mainRef.current;
+    setTopBarFloated(el ? el.scrollTop > TOPBAR_SCROLL_THRESHOLD : false);
+  }, [activeView]);
+
   const initials = business.name
     .split(' ')
     .map((w) => w[0])
@@ -58,42 +78,94 @@ export default function AppShell({
     .toUpperCase();
 
   return (
-    <div className="flex min-h-screen relative">
-      {/* Floating animated orbs (background) */}
-      <div className="orb" style={{ top: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(94,84,215,0.6), transparent 70%)', animation: 'orb-float-1 18s ease-in-out infinite' }} />
-      <div className="orb" style={{ top: '40%', right: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(0,212,255,0.4), transparent 70%)', animation: 'orb-float-2 22s ease-in-out infinite' }} />
-      <div className="orb" style={{ bottom: '-15%', left: '30%', width: '550px', height: '550px', background: 'radial-gradient(circle, rgba(186,79,255,0.45), transparent 70%)', animation: 'orb-float-3 20s ease-in-out infinite' }} />
+    <div style={{ display: 'flex', height: '100vh', width: '100%', overflow: 'hidden', position: 'relative', background: 'transparent' }}>
+      {/* Light blue glow — massive, bright, spread across the whole page */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        {/* Full-page royal blue base wash */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(ellipse 160% 120% at 50% 50%, rgba(45,53,197,0.55) 0%, rgba(35,42,180,0.3) 45%, transparent 70%)',
+          filter: 'blur(40px)',
+          animation: 'wave-drift 18s ease-in-out infinite',
+        }} />
+        {/* Bright vivid centre hotspot */}
+        <div style={{
+          position: 'absolute',
+          width: '60vw', height: '60vw',
+          top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(65,75,220,0.7) 0%, rgba(50,60,210,0.45) 25%, rgba(40,50,200,0.2) 50%, transparent 68%)',
+          filter: 'blur(22px)',
+          animation: 'wave-drift 11s ease-in-out infinite reverse',
+        }} />
+        {/* Upper spread */}
+        <div style={{
+          position: 'absolute',
+          width: '90vw', height: '70vw',
+          top: '-20%', left: '10%',
+          background: 'radial-gradient(circle, rgba(50,60,210,0.45) 0%, transparent 60%)',
+          filter: 'blur(50px)',
+          animation: 'wave-drift 14s ease-in-out infinite',
+        }} />
+        {/* Lower spread */}
+        <div style={{
+          position: 'absolute',
+          width: '90vw', height: '70vw',
+          top: '55%', left: '15%',
+          background: 'radial-gradient(circle, rgba(45,55,205,0.4) 0%, transparent 60%)',
+          filter: 'blur(50px)',
+          animation: 'wave-drift 21s ease-in-out infinite reverse',
+        }} />
+        {/* Right fill */}
+        <div style={{
+          position: 'absolute',
+          width: '60vw', height: '80vw',
+          top: '10%', right: '-10%',
+          background: 'radial-gradient(circle, rgba(50,60,210,0.38) 0%, transparent 60%)',
+          filter: 'blur(55px)',
+          animation: 'wave-drift 16s ease-in-out infinite',
+        }} />
+      </div>
 
       {/* Sidebar */}
-      <aside className="fixed inset-y-4 left-4 z-30 flex w-64 flex-col rounded-3xl glass" style={{ height: 'calc(100vh - 2rem)' }}>
+      <aside
+        style={{
+          width: '260px',
+          flexShrink: 0,
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          background: SIDEBAR_BG,
+          borderRight: 'none',
+        }}
+      >
         {/* Logo */}
-        <div className="px-6 pt-6 pb-5">
-          <div className="flex items-center gap-3">
-            <div
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold text-white"
-              style={{
-                background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
-                boxShadow: '0 8px 24px rgba(79, 172, 254, 0.4)',
-              }}
-            >
-              CS
-              <div className="absolute inset-0 rounded-xl spin-slow" style={{ background: 'conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)', mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude', WebkitMaskComposite: 'xor', padding: '1px' }} />
+        <div style={{ position: 'relative', zIndex: 1, padding: '40px 24px 22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
+              background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+            }}>
+              <span style={{ fontSize: '14px', fontWeight: 900, color: '#0a10a0' }}>CS</span>
             </div>
-            <div>
-              <span className="text-base font-bold tracking-tight text-white">CallSense</span>
-              <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>AI Voice Platform</p>
-            </div>
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: '14px', letterSpacing: '0.12em' }}>
+              CALLSENSE
+            </span>
           </div>
         </div>
 
-        <div className="mx-5 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)' }} />
+        <div style={{ position: 'relative', zIndex: 1, height: '1px', margin: '0 20px 6px', background: 'transparent' }} />
 
-        <p className="mt-5 mb-2 px-6 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        {/* PAGES label */}
+        <div style={{ position: 'relative', zIndex: 1, padding: '14px 24px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
           Pages
-        </p>
+        </div>
 
-        {/* Nav */}
-        <nav className="space-y-1 px-3">
+        {/* Nav items */}
+        <nav style={{ position: 'relative', zIndex: 1, padding: '0 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {nav.map(({ id, label, Icon }) => {
             const active = activeView === id;
             return (
@@ -101,89 +173,130 @@ export default function AppShell({
                 key={id}
                 type="button"
                 onClick={() => onNavigate(id)}
-                className="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300"
-                style={
-                  active
-                    ? {
-                        background: 'linear-gradient(127deg, rgba(6, 11, 40, 0.94) 28.26%, rgba(10, 14, 35, 0.49) 91.2%)',
-                        color: '#fff',
-                      }
-                    : {
-                        color: 'rgba(255,255,255,0.55)',
-                      }
-                }
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '12px',
+                  width: '100%', padding: '10px 12px', borderRadius: '12px',
+                  border: 'none', cursor: 'pointer', textAlign: 'left',
+                  fontSize: '14px', fontWeight: active ? 600 : 500,
+                  color: '#fff',
+                  background: active ? NAV_ROW_ACTIVE_BG : 'transparent',
+                  transition: 'background 0.2s',
+                }}
               >
-                <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all"
-                  style={{
-                    background: active ? 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)' : 'rgba(255,255,255,0.08)',
-                    boxShadow: active ? '0 4px 12px rgba(79,172,254,0.4)' : 'none',
-                  }}
-                >
-                  <Icon className="h-4 w-4 shrink-0" style={{ color: active ? '#fff' : 'rgba(255,255,255,0.55)' }} />
+                <span style={{
+                  width: '36px', height: '36px', borderRadius: '12px', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: active ? NAV_ICON_ACTIVE : NAV_ICON_TILE_INACTIVE,
+                  boxShadow: 'none',
+                  transition: 'background 0.2s',
+                }}>
+                  <Icon
+                    style={{
+                      width: '17px', height: '17px',
+                      color: active ? '#fff' : NAV_ICON_INACTIVE_COLOR,
+                    }}
+                  />
                 </span>
-                <span className={active ? 'font-bold' : ''}>{label}</span>
+                <span>{label}</span>
               </button>
             );
           })}
 
-          <p className="mt-5 mb-2 px-3 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          {/* TOOLS label */}
+          <div style={{ padding: '18px 14px 6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
             Tools
-          </p>
+          </div>
 
-          <a href="/metrics" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-white/5" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(255,255,255,0.08)' }}>
-              <IconBarChart className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.65)' }} />
-            </span>
-            Metrics
-          </a>
-          <a href="/admin" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-white/5" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(255,255,255,0.08)' }}>
-              <IconFlask className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.65)' }} />
-            </span>
-            Test Agent
-          </a>
+          {[
+            { href: '/admin', label: 'Test Agent', Icon: IconFlask },
+          ].map(({ href, label, Icon }) => {
+            const activeTool = activeView === 'admin';
+            return (
+            <Link
+              key={href}
+              href={href}
+              prefetch
+              style={{
+                display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px',
+                borderRadius: '12px', textDecoration: 'none', fontSize: '14px', fontWeight: activeTool ? 600 : 500,
+                color: '#fff', background: activeTool ? NAV_ROW_ACTIVE_BG : 'transparent', transition: 'background 0.2s',
+              }}
+            >
+              <span style={{
+                width: '36px', height: '36px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                background: activeTool ? NAV_ICON_ACTIVE : NAV_ICON_TILE_INACTIVE,
+              }}>
+                <Icon style={{ width: '17px', height: '17px', color: activeTool ? '#fff' : NAV_ICON_INACTIVE_COLOR }} />
+              </span>
+              {label}
+            </Link>
+            );
+          })}
         </nav>
 
-        {/* Bottom section */}
-        <div className="mt-auto m-3 mb-4 space-y-3">
-          {/* Promo card */}
-          <div
-            className="relative overflow-hidden rounded-2xl p-4"
-            style={{ boxShadow: '0 10px 30px rgba(88, 44, 255, 0.35)' }}
-          >
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'url(/promo-waves.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
-            <div
-              className="absolute inset-0"
-              style={{ background: 'linear-gradient(160deg, rgba(20, 8, 50, 0.45) 0%, rgba(15, 6, 40, 0.7) 100%)' }}
-            />
-            <div className="relative">
-              <div
-                className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)' }}
-              >
-                <IconHeadphones className="h-4 w-4 text-white" />
+        {/* Promo card — Vision UI "Need help?" mesh gradient */}
+        <div style={{ position: 'relative', zIndex: 1, marginTop: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{
+            borderRadius: '18px',
+            padding: '20px 18px 18px',
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'linear-gradient(155deg, #0d1038 0%, #151b6e 22%, #1e3a8a 42%, #2563eb 58%, #312e81 78%, #1e1b4b 100%)',
+            boxShadow: '0 18px 48px rgba(15, 35, 140, 0.55)',
+          }}>
+            {/* Mesh blob — electric blue top-right */}
+            <div style={{
+              position: 'absolute', top: '-35%', right: '-28%', width: '95%', height: '85%',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle at 40% 40%, rgba(96,165,250,0.75) 0%, rgba(59,130,246,0.35) 38%, transparent 68%)',
+              filter: 'blur(28px)', pointerEvents: 'none',
+            }} />
+            {/* Mesh blob — deep indigo bottom */}
+            <div style={{
+              position: 'absolute', bottom: '-45%', left: '-20%', width: '100%', height: '70%',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle at 50% 30%, rgba(30,58,138,0.9) 0%, rgba(49,46,129,0.45) 45%, transparent 70%)',
+              filter: 'blur(22px)', pointerEvents: 'none',
+            }} />
+            {/* Mesh streak — center highlight */}
+            <div style={{
+              position: 'absolute', top: '18%', left: '8%', width: '75%', height: '50%',
+              background: 'radial-gradient(ellipse 85% 70% at 50% 50%, rgba(147,197,253,0.35) 0%, transparent 72%)',
+              filter: 'blur(16px)', transform: 'rotate(-12deg)', pointerEvents: 'none',
+            }} />
+            {/* Purple edge wash */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(210deg, transparent 50%, rgba(76,29,149,0.22) 100%)', pointerEvents: 'none' }} />
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ marginBottom: '14px', lineHeight: 0 }}>
+                <svg
+                  style={{ width: '26px', height: '26px', color: '#38bdf8', filter: 'drop-shadow(0 0 14px rgba(56,189,248,0.85))' }}
+                  viewBox="0 0 24 24" fill="currentColor" aria-hidden
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
               </div>
-              <p className="text-sm font-bold text-white">Need help?</p>
-              <p className="mt-0.5 text-[10px] text-white/80 leading-relaxed">
-                Please check our docs
-              </p>
+              <p style={{ color: '#fff', fontWeight: 700, fontSize: '15px', letterSpacing: '-0.01em', margin: '0 0 6px' }}>Need help?</p>
+              <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: '12px', fontWeight: 500, lineHeight: 1.45, margin: '0 0 18px' }}>Please check our docs</p>
               <a
                 href="https://github.com/Decipher369/CursorBuildathon"
                 target="_blank"
                 rel="noopener"
-                className="mt-3 block w-full rounded-xl py-2 text-center text-[10px] font-bold tracking-wider text-white transition-all hover:opacity-90"
                 style={{
-                  background: 'rgba(0,0,0,0.5)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  display: 'block',
+                  textAlign: 'center',
+                  padding: '12px 16px',
+                  borderRadius: '9999px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  color: '#fff',
+                  textDecoration: 'none',
+                  background: 'rgba(6, 10, 32, 0.55)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: 'none',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
                 }}
               >
                 DOCUMENTATION
@@ -191,30 +304,35 @@ export default function AppShell({
             </div>
           </div>
 
-          <a
+          {/* Cyan pill button — "Upgrade to PRO" style */}
+          <Link
             href="/admin"
-            className="block w-full rounded-xl py-2.5 text-center text-[11px] font-bold tracking-wider text-white transition-all hover:scale-[1.02]"
+            prefetch
             style={{
-              background: 'linear-gradient(310deg, #4facfe 0%, #00f2fe 100%)',
-              boxShadow: '0 8px 24px rgba(79, 172, 254, 0.4)',
+              display: 'block', textAlign: 'center', padding: '12px 0',
+              borderRadius: '50px', fontSize: '13px', fontWeight: 700,
+              color: '#fff', textDecoration: 'none',
+              background: 'linear-gradient(90deg, #00d2ff 0%, #00b4d8 50%, #0096c7 100%)',
+              boxShadow: 'none',
             }}
           >
             TEST AGENT
-          </a>
+          </Link>
 
           {/* Sign out */}
           <button
             type="button"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-[11px] font-bold uppercase tracking-widest transition-all hover:scale-[1.01] disabled:opacity-50"
             style={{
-              background: 'rgba(245,87,108,0.1)',
-              border: '1px solid rgba(245,87,108,0.25)',
-              color: '#f5576c',
+              display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center',
+              gap: '8px', borderRadius: '12px', padding: '10px 0',
+              fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+              background: 'rgba(245,87,108,0.1)', border: '1px solid rgba(245,87,108,0.25)',
+              color: '#f5576c', cursor: 'pointer', opacity: signingOut ? 0.5 : 1,
             }}
           >
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg style={{ width: '14px', height: '14px' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
@@ -224,23 +342,59 @@ export default function AppShell({
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="ml-72 mr-4 min-h-screen flex-1">
-        {/* Top bar */}
-        <div className="sticky top-4 z-20 mt-4 flex items-center justify-between rounded-2xl glass px-5 py-3">
+      {/* Main content — scrolls independently, sidebar stays fixed */}
+      <main
+        ref={mainRef}
+        onScroll={onMainScroll}
+        style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto', background: 'transparent' }}
+      >
+        {/* Top bar — transparent at scroll top; glossy rounded pill when scrolled */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
+            padding: topBarFloated ? '10px 16px 0' : '0',
+            transition: 'padding 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 24px',
+              background: topBarFloated
+                ? 'linear-gradient(135deg, rgba(14, 22, 58, 0.58) 0%, rgba(12, 18, 48, 0.45) 100%)'
+                : 'transparent',
+              backdropFilter: topBarFloated ? 'blur(20px)' : 'none',
+              WebkitBackdropFilter: topBarFloated ? 'blur(20px)' : 'none',
+              borderRadius: topBarFloated ? '16px' : '0',
+              boxShadow: topBarFloated
+                ? '0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08)'
+                : 'none',
+              border: topBarFloated ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
+              transition: 'background 0.22s ease, box-shadow 0.22s ease, border-radius 0.22s ease, border-color 0.22s ease, backdrop-filter 0.22s ease',
+            }}
+          >
           <div>
-            <p className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              Pages / <span className="text-white">{VIEW_TITLES[activeView]}</span>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {/* Home icon */}
+              <svg style={{ width: '11px', height: '11px', color: 'rgba(255,255,255,0.45)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              <span style={{ color: 'rgba(255,255,255,0.4)' }}>/</span>
+              <span style={{ color: 'rgba(255,255,255,0.6)' }}>{VIEW_TITLES[activeView]}</span>
             </p>
-            <p className="text-base font-bold text-white">{VIEW_TITLES[activeView]}</p>
+            <p style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: 0 }}>{VIEW_TITLES[activeView]}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {/* Search */}
-            <div className="hidden md:flex items-center gap-2 rounded-xl px-3 py-2 w-56" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)', width: '200px' }}>
+              <svg style={{ width: '13px', height: '13px', color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
               </svg>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Type here...</span>
+              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Type here...</span>
             </div>
 
             {/* Profile + sign out */}
@@ -248,40 +402,43 @@ export default function AppShell({
               onClick={handleSignOut}
               disabled={signingOut}
               title="Sign out"
-              className="flex items-center gap-2 rounded-xl px-3 py-2 transition-all hover:bg-white/10 disabled:opacity-50"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '7px 14px', borderRadius: '50px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', cursor: 'pointer', opacity: signingOut ? 0.5 : 1 }}
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)' }}>
+              <div style={{ display: 'flex', width: '24px', height: '24px', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '10px', fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)', flexShrink: 0 }}>
                 {initials}
               </div>
-              <span className="text-xs font-semibold text-white">{business.name.split(' ')[0]}</span>
-              <svg className="h-3 w-3 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{business.name.split(' ')[0]}</span>
+              <svg style={{ width: '12px', height: '12px', opacity: 0.4 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
             </button>
 
-            {/* Settings cog */}
-            <button className="flex h-9 w-9 items-center justify-center rounded-xl transition-all" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {/* Settings */}
+            <button style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg style={{ width: '15px', height: '15px', color: 'rgba(255,255,255,0.6)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
               </svg>
             </button>
 
             {/* Notifications */}
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-xl transition-all" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <button style={{ position: 'relative', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg style={{ width: '15px', height: '15px', color: 'rgba(255,255,255,0.6)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
-              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full" style={{ background: '#f5576c', boxShadow: '0 0 6px #f5576c' }} />
+              <span style={{ position: 'absolute', top: '2px', right: '2px', width: '7px', height: '7px', borderRadius: '50%', background: '#f5576c' }} />
             </button>
           </div>
-        </div>
+          </div>{/* end glass pill */}
+        </div>{/* end sticky wrapper */}
 
-        <div>{children}</div>
+        {/* Page content */}
+        <div style={{ flex: 1, padding: '20px 28px' }}>
+          {children}
+        </div>
       </main>
     </div>
   );
