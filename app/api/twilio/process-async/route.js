@@ -3,6 +3,7 @@ import twilio from 'twilio';
 import { transcribeAudio, analyzeSentiment } from '@/lib/valsea';
 import { uploadCallAudio } from '@/lib/audio-storage';
 import { handleProcessCall } from '@/lib/process-call-handler';
+import { getBusiness } from '@/lib/supabase';
 import { getBaseUrl } from '@/lib/config';
 import { twimlError, twimlResponse } from '@/lib/twiml-error';
 
@@ -35,8 +36,9 @@ export async function POST(request) {
       },
     });
 
+    const business = await getBusiness(business_id);
     const audioBuffer = Buffer.from(audioResponse.data);
-    const transcript = await transcribeAudio(audioBuffer);
+    const transcript = await transcribeAudio(audioBuffer, business?.language ?? 'en');
     const { score: sentiment_score, label: sentiment_label } =
       await analyzeSentiment(transcript);
 
