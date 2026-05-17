@@ -84,7 +84,8 @@ export default function SetupAssistantView({
   }, []);
 
   useEffect(() => {
-    fetchQuestion(1);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial questionnaire load
+    void fetchQuestion(1);
   }, [fetchQuestion]);
 
   async function handleNext(e: React.FormEvent) {

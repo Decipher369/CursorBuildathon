@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import twilio from 'twilio';
 import { NextResponse } from 'next/server';
 import { transcribeAudio, analyzeSentiment } from '@/lib/valsea';
@@ -48,7 +48,9 @@ function buildTwiml(opts: {
   nextActionUrl?: string;
   hangup?: boolean;
 }): string {
-  const VoiceResponse = (twilio.twiml as any).VoiceResponse;
+  const VoiceResponse = (
+    twilio.twiml as unknown as { VoiceResponse: new () => import('twilio/lib/twiml/VoiceResponse').default }
+  ).VoiceResponse;
   const twiml = new VoiceResponse();
 
   if (opts.audioUrl) {
@@ -102,18 +104,21 @@ async function fetchRecordingWithRetry(
       const buf = Buffer.from(res.data as ArrayBuffer);
       console.log(`[process-async] Recording fetched, bytes:`, buf.length);
       return buf;
-    } catch (err: any) {
+    } catch (err: unknown) {
       lastErr = err;
+      const status = isAxiosError(err) ? err.response?.status : undefined;
       console.log(
         `[process-async] Attempt ${attempt} failed, status:`,
-        err?.response?.status,
-        err?.message,
+        status,
+        err instanceof Error ? err.message : err,
       );
       if (attempt < maxAttempts) await new Promise((r) => setTimeout(r, retryDelayMs));
     }
   }
   throw new Error(
-    `Failed to fetch recording after ${maxAttempts} attempts: ${(lastErr as any)?.message}`,
+    `Failed to fetch recording after ${maxAttempts} attempts: ${
+      lastErr instanceof Error ? lastErr.message : String(lastErr)
+    }`,
   );
 }
 
@@ -168,18 +173,25 @@ export async function POST(request: Request) {
       let audioBuffer: Buffer | null = null;
       try {
         audioBuffer = await fetchRecordingWithRetry(wavUrl, accountSid, authToken);
-      } catch (err: any) {
-        console.log('[process-async] Could not fetch recording:', err.message);
+      } catch (err: unknown) {
+        console.log(
+          '[process-async] Could not fetch recording:',
+          err instanceof Error ? err.message : err,
+        );
       }
 
       if (audioBuffer) {
         try {
           transcript = await transcribeAudio(audioBuffer);
           console.log('[process-async] Valsea transcript:', transcript);
-        } catch (err: any) {
-          console.log('[process-async] Valsea error:', err.message);
-          if (err?.response) {
-            const body = err.response.data;
+        } catch (err: unknown) {
+          console.log(
+            '[process-async] Valsea error:',
+            err instanceof Error ? err.message : err,
+          );
+          if (err && typeof err === 'object' && 'response' in err) {
+            const withResp = err as { response?: { data?: unknown } };
+            const body = withResp.response?.data;
             console.log(
               '[process-async] Valsea body:',
               typeof body === 'object' ? JSON.stringify(body) : String(body),
@@ -223,8 +235,11 @@ export async function POST(request: Request) {
     const [{ score: sentiment_score, label: sentiment_label }, audio_base64] =
       await Promise.all([
         sentimentPromise,
-        textToSpeech(openaiResult.response).catch((err: any) => {
-          console.log('[process-async] ElevenLabs error:', err.message);
+        textToSpeech(openaiResult.response).catch((err: unknown) => {
+          console.log(
+            '[process-async] ElevenLabs error:',
+            err instanceof Error ? err.message : err,
+          );
           return null as string | null;
         }),
       ]);
@@ -265,8 +280,11 @@ export async function POST(request: Request) {
       resolved: openaiResult.intent !== 'escalation',
       escalated,
       duration_seconds: 0,
-    } as Record<string, unknown>).catch((err: any) =>
-      console.log('[process-async] insertCall error:', err.message),
+    } as Record<string, unknown>).catch((err: unknown) =>
+      console.log(
+        '[process-async] insertCall error:',
+        err instanceof Error ? err.message : err,
+      ),
     );
 
     // ── Step 10: Build TwiML response ─────────────────────────────
@@ -277,8 +295,11 @@ export async function POST(request: Request) {
         const audioUrl = await uploadCallAudio(audio_base64);
         console.log('[process-async] Audio uploaded:', audioUrl);
         return xmlResponse(buildTwiml({ audioUrl, nextActionUrl: actionUrl, hangup: shouldHangup }));
-      } catch (err: any) {
-        console.log('[process-async] uploadCallAudio error:', err.message);
+      } catch (err: unknown) {
+        console.log(
+          '[process-async] uploadCallAudio error:',
+          err instanceof Error ? err.message : err,
+        );
       }
     }
 
@@ -299,12 +320,16 @@ export async function POST(request: Request) {
         setTimeout(() => reject(new Error('timeout')), 12000),
       ),
     ]);
-  } catch (err: any) {
-    if (err.message === 'timeout') {
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message === 'timeout') {
       console.log('[process-async] Hard timeout — keeping conversation alive');
       return keepAlive('Sorry, I am still processing. Please say that again.');
     }
-    console.log('[process-async] Unhandled error:', err.message, err.stack);
+    console.log(
+      '[process-async] Unhandled error:',
+      err instanceof Error ? err.message : err,
+      err instanceof Error ? err.stack : '',
+    );
     return keepAlive('Sorry, something went wrong. Please go ahead and speak.');
   }
 }

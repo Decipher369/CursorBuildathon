@@ -18,7 +18,8 @@ export function useCalls(businessId: string) {
   }, [businessId]);
 
   useEffect(() => {
-    loadCalls()
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount (state updates run in promise microtasks)
+    void loadCalls()
       .catch((e) =>
         setError(e instanceof Error ? e.message : 'Failed to load calls'),
       )

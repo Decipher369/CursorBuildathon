@@ -9,7 +9,6 @@ const PROTECTED = [
   '/onboarding',
   '/demo',
   '/admin',
-  '/metrics',
   '/api/businesses',
   '/api/calls',
   '/api/ai',

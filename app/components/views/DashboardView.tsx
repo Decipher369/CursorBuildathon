@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { Business } from '@/lib/business-types';
@@ -9,7 +9,6 @@ import {
   computeCallsByDay,
   computeIntentCounts,
   computeKpis,
-  computeNeedsAttention,
   maskPhone,
 } from '@/lib/call-stats';
 import { useCalls } from '../hooks/useCalls';
@@ -387,7 +386,6 @@ export default function DashboardView({ business }: { business: Business }) {
   const kpis = useMemo(() => computeKpis(calls), [calls]);
   const callsByDay = useMemo(() => computeCallsByDay(calls, 7), [calls]);
   const intentCounts = useMemo(() => computeIntentCounts(calls, 6), [calls]);
-  const needsAttention = useMemo(() => computeNeedsAttention(calls).slice(0, 4), [calls]);
 
   return (
     <div className="text-white">

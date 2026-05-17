@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import type { Business } from '@/lib/business-types';
 import type { CallRow } from '@/lib/call-stats';
-import { maskPhone, formatDuration } from '@/lib/call-stats';
+import { maskPhone } from '@/lib/call-stats';
 import CallAudioListenButton from '../CallAudioListenButton';
 import { useCalls } from '../hooks/useCalls';
 
@@ -340,14 +340,10 @@ function CallerProfile({
 
 export default function CallLogsView({ business }: { business: Business }) {
   const { calls, loading, error } = useCalls(business.id);
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const sessions = useMemo(() => groupIntoSessions(calls), [calls]);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [callerProfile, setCallerProfile] = useState<CallerProfile | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    setSessions(groupIntoSessions(calls));
-  }, [calls]);
 
   const filteredSessions = sessions.filter((s) => {
     if (!searchQuery) return true;
