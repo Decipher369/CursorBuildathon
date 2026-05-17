@@ -8,16 +8,16 @@ AI voice receptionist for Southeast Asia (SEA) businesses. Callers ring a Twilio
 
 ## What it does
 
-- **Real phone calls** — inbound Twilio calls handled end-to-end with voice AI
-- **SEA-tuned transcription** — VALSEA `/v1/audio/transcriptions` with multilingual support (EN, ZH, MS, TA)
-- **Contextual AI agent** — configurable persona, FAQs, hours; remembers returning callers across sessions
-- **Multi-turn conversation** — the agent tracks every turn of a call via `call_sid` and feeds history back to GPT-4o
-- **ElevenLabs voice reply** — natural-sounding TTS played back on the live call
-- **Sentiment analysis** — every call scored and labelled (positive / neutral / negative) via VALSEA
-- **Smart escalation** — auto-flags calls for human follow-up based on configurable threshold (negative, neutral, never)
-- **Customer memory** — returning callers are recognised; call count, last intent, and sentiment trend are injected into the agent prompt
-- **Call logs + analytics** — dashboard with KPIs, area/bar charts, sentiment breakdown, per-session chat thread, and in-browser audio playback
+- **Real phone calls** — inbound Twilio calls handled end-to-end with voice AI; the call loops until the user hangs up
+- **Multi-turn conversation** — every turn of a call is stored with `call_sid`; GPT-4o receives the full in-call history so it remembers what was said earlier in the same call
+- **Returning caller memory** — when someone calls back, the agent knows their name, call count, last intent, and sentiment trend. *"Welcome back! I see you called about a booking last week — how can I help today?"*
+- **SEA-tuned transcription** — VALSEA `/v1/audio/transcriptions` (multipart/form-data, wav audio) with multilingual support
+- **Sentiment analysis** — every turn scored and labelled (positive / neutral / negative) via VALSEA `/v1/sentiment`
+- **ElevenLabs voice reply** — natural-sounding TTS via Vercel Blob → Twilio `<Play>`; falls back to `<Say>` if Blob is unavailable
+- **Silence detection** — 10-second countdown warning then auto-hangup if the caller goes silent
+- **Smart escalation** — auto-flags calls for human follow-up based on configurable threshold (negative / neutral / never)
 - **AI Setup Assistant** — GPT-4o-powered 7-question onboarding wizard that auto-generates agent persona, FAQs, hours, and name
+- **Call logs + analytics** — dashboard with KPIs, charts, sentiment breakdown, per-session chat thread, and in-browser audio playback
 - **Supabase Auth** — email/password sign-in with middleware-enforced route protection; Twilio webhooks stay public
 - **Admin / simulate panel** — test calls with text or audio upload, view live chat transcript, playback agent audio
 
@@ -78,9 +78,9 @@ AI Setup Assistant
 | RLS policies | Done | Auth-scoped; Twilio anon INSERT/SELECT allowed |
 | Twilio inbound voice — full pipeline | Done | Record → VALSEA → OpenAI → ElevenLabs → play |
 | Multi-turn conversation (call_sid loop) | Done | Each turn stored; history fed to GPT-4o |
-| Silence detection + re-record | Done | Warns caller, re-records if silent |
-| VALSEA transcription | Done | `/v1/audio/transcriptions`, wav audio, multipart |
-| VALSEA sentiment analysis | Done | `/v1/sentiment`, graceful neutral fallback |
+| Silence detection + countdown | Done | Warns caller; 10s countdown then hangup |
+| VALSEA transcription | Done | `/v1/audio/transcriptions`, wav audio, multipart/form-data |
+| VALSEA sentiment analysis | Done | `/v1/sentiment`, graceful neutral fallback on error |
 | OpenAI GPT-4o agent | Done | Intent, response, escalation, JSON mode |
 | ElevenLabs TTS | Done | `eleven_multilingual_v2`, base64 → Vercel Blob |
 | Customer memory context | Done | Returning callers, call count, sentiment trend |
@@ -96,7 +96,7 @@ AI Setup Assistant
 | Multi-business support | Not started | API ready; UI restricts to one per MVP |
 | SMS / Messaging webhooks | Not started | Voice only for now |
 
-**Status:** Full inbound call pipeline, auth, and AI setup assistant working end-to-end.
+**Status:** Full inbound call pipeline working end-to-end — transcription, sentiment, multi-turn memory, AI replies, and ElevenLabs voice playback on live calls.
 
 ---
 
