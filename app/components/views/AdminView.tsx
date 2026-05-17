@@ -28,13 +28,13 @@ function PulseDot({ active }: { active: boolean }) {
     <span className="relative flex h-2.5 w-2.5">
       {active && (
         <motion.span
-          className="absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"
+          className="absolute inline-flex h-full w-full rounded-full bg-[#4facfe] opacity-75"
           animate={{ scale: [1, 2.2, 1], opacity: [0.75, 0, 0.75] }}
           transition={{ duration: 1.6, repeat: Infinity }}
         />
       )}
       <span
-        className={`relative inline-flex h-2.5 w-2.5 rounded-full ${active ? 'bg-teal-400' : 'bg-slate-600'}`}
+        className={`relative inline-flex h-2.5 w-2.5 rounded-full ${active ? 'bg-[#4facfe]' : 'bg-slate-600'}`}
       />
     </span>
   );
@@ -64,7 +64,7 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
         className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
           isCaller
             ? 'rounded-bl-sm bg-white/[0.08] text-slate-200'
-            : 'rounded-br-sm bg-teal-500/80 text-white backdrop-blur-sm'
+            : 'rounded-br-sm bg-[#4facfe]/80 text-white backdrop-blur-sm'
         }`}
       >
         <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider opacity-60">
@@ -79,7 +79,7 @@ function ChatBubble({ msg }: { msg: ChatMessage }) {
 function TypingDots() {
   return (
     <div className="flex justify-end">
-      <div className="flex items-center gap-1 rounded-2xl rounded-br-sm bg-teal-500/40 px-4 py-3">
+      <div className="flex items-center gap-1 rounded-2xl rounded-br-sm bg-[#4facfe]/30 px-4 py-3">
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}

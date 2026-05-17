@@ -48,7 +48,7 @@ function SignInForm() {
   return (
     <div
       className="flex min-h-screen items-center justify-center px-4"
-      style={{ background: '#080c10' }}
+      style={{ background: '#0a1430' }}
     >
       {/* Background glows */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -57,7 +57,7 @@ function SignInForm() {
           style={{
             width: 700,
             height: 400,
-            background: 'radial-gradient(ellipse, rgba(0,200,150,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(79,172,254,0.1) 0%, transparent 70%)',
             filter: 'blur(60px)',
           }}
         />
@@ -66,7 +66,7 @@ function SignInForm() {
           style={{
             width: 400,
             height: 400,
-            background: 'radial-gradient(ellipse, rgba(88,44,255,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(0,198,251,0.08) 0%, transparent 70%)',
             filter: 'blur(80px)',
           }}
         />
@@ -83,7 +83,7 @@ function SignInForm() {
           <Link href="/" className="flex items-center gap-2.5">
             <span
               className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-black"
-              style={{ background: '#00C896', color: '#080c10' }}
+              style={{ background: 'linear-gradient(135deg, #4facfe 0%, #007bff 100%)', color: '#fff' }}
             >
               CS
             </span>
@@ -158,7 +158,7 @@ function SignInForm() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-4 overflow-hidden rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm text-teal-400"
+                className="mb-4 overflow-hidden rounded-xl border border-[#4facfe]/30 bg-[#4facfe]/10 px-4 py-3 text-sm text-[#4facfe]"
               >
                 {success}
               </motion.div>
@@ -179,7 +179,7 @@ function SignInForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="you@business.com"
-                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-teal-500/60 transition-all"
+                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-[#4facfe]/60 transition-all"
                 style={{
                   background: 'rgba(255,255,255,0.06)',
                   border: '1px solid rgba(255,255,255,0.1)',
@@ -201,7 +201,7 @@ function SignInForm() {
                 required
                 placeholder="••••••••"
                 minLength={6}
-                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-teal-500/60 transition-all"
+                className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-[#4facfe]/60 transition-all"
                 style={{
                   background: 'rgba(255,255,255,0.06)',
                   border: '1px solid rgba(255,255,255,0.1)',
@@ -217,10 +217,10 @@ function SignInForm() {
               className="mt-2 w-full rounded-xl py-3 text-sm font-bold text-white transition-all disabled:opacity-50"
               style={{
                 background: loading
-                  ? 'rgba(0,200,150,0.3)'
-                  : 'linear-gradient(135deg, #00C896 0%, #00a87e 100%)',
-                boxShadow: loading ? 'none' : '0 8px 24px rgba(0,200,150,0.3)',
-                color: '#080c10',
+                  ? 'rgba(79,172,254,0.3)'
+                  : 'linear-gradient(135deg, #4facfe 0%, #00c6fb 100%)',
+                boxShadow: loading ? 'none' : '0 8px 24px rgba(79,172,254,0.35)',
+                color: '#060818',
               }}
             >
               {loading ? (

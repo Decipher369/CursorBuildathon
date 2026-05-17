@@ -92,17 +92,15 @@ function buildSession(
 }
 
 function sentimentColors(label: string) {
-  if (label === 'positive') return 'bg-emerald-100 text-emerald-800';
-  if (label === 'negative') return 'bg-red-100 text-red-800';
-  return 'bg-amber-100 text-amber-800';
+  if (label === 'positive') return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+  if (label === 'negative') return 'bg-red-500/20 text-red-300 border border-red-500/30';
+  return 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
 }
 
 function SentimentBadge({ label }: { label?: string }) {
   const normalized = label ?? 'neutral';
   return (
-    <span
-      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize ${sentimentColors(normalized)}`}
-    >
+    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize ${sentimentColors(normalized)}`}>
       {normalized}
     </span>
   );
@@ -110,7 +108,7 @@ function SentimentBadge({ label }: { label?: string }) {
 
 function IntentBadge({ intent }: { intent?: string }) {
   return (
-    <span className="inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium capitalize text-slate-600">
+    <span className="inline-block rounded-full bg-white/[0.08] border border-white/10 px-2 py-0.5 text-xs font-medium capitalize text-slate-300">
       {intent ?? 'unknown'}
     </span>
   );
@@ -131,15 +129,17 @@ function SessionListItem({
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full cursor-pointer border-b border-slate-100 px-4 py-3 text-left transition-colors hover:bg-teal-50/60 ${
-        selected ? 'bg-teal-50 border-l-2 border-l-teal-500' : ''
+      className={`w-full cursor-pointer px-4 py-3 text-left transition-colors ${
+        selected
+          ? 'bg-[#4facfe]/10 border-l-2 border-l-[#4facfe]'
+          : 'border-b border-white/[0.06] hover:bg-white/[0.04]'
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="font-mono text-xs font-semibold text-slate-800">
+        <span className="font-mono text-xs font-semibold text-white">
           {maskPhone(session.phone_number)}
         </span>
-        <span className="shrink-0 text-xs text-slate-400">
+        <span className="shrink-0 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
           {new Date(session.started_at).toLocaleString(undefined, {
             month: 'short',
             day: 'numeric',
@@ -152,11 +152,11 @@ function SessionListItem({
         <SentimentBadge label={session.overall_sentiment} />
         <IntentBadge intent={session.dominant_intent} />
         {session.escalated && (
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+          <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-xs font-medium text-amber-300">
             Escalated
           </span>
         )}
-        <span className="text-xs text-slate-400">
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
           {session.turns.length} {session.turns.length === 1 ? 'turn' : 'turns'}
         </span>
       </div>
@@ -178,21 +178,21 @@ function ChatThread({
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+      <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div>
           <button
             type="button"
             onClick={() => onCallerClick(session.phone_number)}
-            className="font-mono text-sm font-semibold text-teal-700 underline-offset-2 hover:underline"
+            className="font-mono text-sm font-semibold text-[#4facfe] underline-offset-2 hover:underline"
             title="View caller profile"
           >
             {maskPhone(session.phone_number)}
           </button>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
             {new Date(session.started_at).toLocaleString()} ·{' '}
             {session.turns.length} {session.turns.length === 1 ? 'turn' : 'turns'}
             {session.call_sid && (
-              <span className="ml-2 font-mono text-slate-300">{session.call_sid.slice(0, 16)}…</span>
+              <span className="ml-2 font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{session.call_sid.slice(0, 16)}…</span>
             )}
           </p>
         </div>
@@ -200,7 +200,7 @@ function ChatThread({
           <SentimentBadge label={session.overall_sentiment} />
           <IntentBadge intent={session.dominant_intent} />
           {session.escalated && (
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+            <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-xs font-medium text-amber-300">
               Escalated
             </span>
           )}
@@ -214,18 +214,15 @@ function ChatThread({
             {turn.transcript && (
               <div className="flex justify-start">
                 <div className="max-w-[80%]">
-                  <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
+                  <p className="mb-1 text-xs font-medium uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.45)' }}>
                     Caller
                     {idx === 0 && (
-                      <span className="ml-2 normal-case text-slate-300">
-                        {new Date(turn.created_at).toLocaleTimeString(undefined, {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                      <span className="ml-2 normal-case" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        {new Date(turn.created_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     )}
                   </p>
-                  <div className="rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-2.5 text-sm text-slate-800">
+                  <div className="rounded-2xl rounded-tl-sm bg-white/[0.08] px-4 py-2.5 text-sm text-slate-200">
                     {turn.transcript}
                   </div>
                 </div>
@@ -234,10 +231,10 @@ function ChatThread({
             {turn.agent_response && (
               <div className="flex justify-end">
                 <div className="max-w-[80%]">
-                  <p className="mb-1 text-right text-xs font-medium uppercase tracking-wide text-teal-400">
+                  <p className="mb-1 text-right text-xs font-medium uppercase tracking-wide text-[#4facfe]">
                     Agent
                   </p>
-                  <div className="rounded-2xl rounded-tr-sm bg-teal-600 px-4 py-2.5 text-sm text-white">
+                  <div className="rounded-2xl rounded-tr-sm bg-[#4facfe]/80 px-4 py-2.5 text-sm text-white backdrop-blur-sm">
                     {turn.agent_response}
                   </div>
                   {turn.sentiment_label && (
@@ -254,9 +251,9 @@ function ChatThread({
 
       {/* Footer */}
       {lastAgentTurn?.audio_base64 && (
-        <div className="border-t border-slate-100 px-6 py-3">
+        <div className="px-6 py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">Last agent reply:</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Last agent reply:</span>
             <CallAudioListenButton audio_base64={lastAgentTurn.audio_base64} />
           </div>
         </div>
@@ -281,12 +278,12 @@ function CallerProfile({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-start justify-between border-b border-slate-100 px-6 py-4">
+      <div className="flex items-start justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div>
-          <p className="font-mono text-sm font-semibold text-slate-900">
+          <p className="font-mono text-sm font-semibold text-white">
             {maskPhone(profile.phone_number)}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
             {profile.sessions.length} sessions · {totalTurns} total turns ·{' '}
             {escalatedCount} escalated
           </p>
@@ -294,7 +291,7 @@ function CallerProfile({
         <button
           type="button"
           onClick={onClose}
-          className="text-slate-400 hover:text-slate-600"
+          className="text-slate-400 hover:text-white transition-colors"
           aria-label="Close profile"
         >
           ✕
@@ -307,27 +304,28 @@ function CallerProfile({
             key={session.key}
             type="button"
             onClick={() => onSelectSession(session)}
-            className="w-full cursor-pointer border-b border-slate-50 px-6 py-3 text-left hover:bg-teal-50/60"
+            className="w-full cursor-pointer px-6 py-3 text-left hover:bg-white/[0.04] transition-colors"
+            style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-slate-500">
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
                 {new Date(session.started_at).toLocaleString()}
               </span>
               <div className="flex items-center gap-1.5">
                 <SentimentBadge label={session.overall_sentiment} />
                 {session.escalated && (
-                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                  <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-xs font-medium text-amber-300">
                     Escalated
                   </span>
                 )}
               </div>
             </div>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {session.turns.length} {session.turns.length === 1 ? 'turn' : 'turns'} ·{' '}
               {session.dominant_intent}
             </p>
             {session.turns[0]?.transcript && (
-              <p className="mt-0.5 truncate text-xs text-slate-500">
+              <p className="mt-0.5 truncate text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 {session.turns[0].transcript}
               </p>
             )}
@@ -377,12 +375,12 @@ export default function CallLogsView({ business }: { business: Business }) {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
       {/* Session list */}
-      <aside className="flex w-80 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-100 px-4 py-4">
-          <h1 className="text-base font-semibold text-slate-900">Call Logs</h1>
-          <p className="text-xs text-slate-400">
+      <aside className="flex w-80 shrink-0 flex-col" style={{ background: 'rgba(8,12,32,0.6)', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="px-4 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <h1 className="text-base font-semibold text-white">Call Logs</h1>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
             {loading ? 'Loading…' : `${sessions.length} sessions`}
           </p>
           <input
@@ -390,19 +388,20 @@ export default function CallLogsView({ business }: { business: Business }) {
             placeholder="Search calls…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-200"
+            className="mt-2 w-full rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-[#4facfe]/50 transition-all"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
           />
         </div>
 
         {error && (
-          <div className="mx-3 mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+          <div className="mx-3 mt-3 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
             {error}
           </div>
         )}
 
         <div className="flex-1 overflow-y-auto">
           {filteredSessions.length === 0 && !loading && (
-            <p className="px-4 py-8 text-center text-xs text-slate-400">
+            <p className="px-4 py-8 text-center text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
               {searchQuery ? 'No sessions match your search.' : 'No calls yet. Run a simulation from the Dashboard.'}
             </p>
           )}
@@ -418,7 +417,7 @@ export default function CallLogsView({ business }: { business: Business }) {
       </aside>
 
       {/* Main panel */}
-      <main className="flex flex-1 flex-col overflow-hidden bg-slate-50">
+      <main className="flex flex-1 flex-col overflow-hidden" style={{ background: 'rgba(10,16,40,0.5)' }}>
         {callerProfile ? (
           <CallerProfile
             profile={callerProfile}
@@ -432,11 +431,11 @@ export default function CallLogsView({ business }: { business: Business }) {
           />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-100 text-2xl">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#4facfe]/15 text-2xl">
               💬
             </div>
-            <p className="text-sm font-medium text-slate-600">Select a session to view the conversation</p>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="text-sm font-medium text-white">Select a session to view the conversation</p>
+            <p className="mt-1 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
               Each session groups all turns of one phone call
             </p>
           </div>
