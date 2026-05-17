@@ -121,16 +121,15 @@ export default async function HomePage() {
   }
 
   const ctaHref = hasApp ? '/dashboard' : '/signin';
-  const ctaLabel = hasApp ? `Open Dashboard` : 'Get Started Free';
 
   return (
-    <div className="min-h-screen bg-[#080c10] text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a1430] text-white font-sans overflow-x-hidden">
 
       {/* ── NAVBAR ────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-[#080c10]/80 backdrop-blur-xl">
+      <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-[#0a1430]/80 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00C896] text-sm font-black text-[#080c10]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#4facfe] to-[#007bff] text-sm font-black text-white">
               CS
             </span>
             <span className="text-lg font-bold tracking-tight">CallSense</span>
@@ -152,14 +151,14 @@ export default async function HomePage() {
           <div className="flex items-center gap-3">
             {hasApp && (
               <Link href="/dashboard"
-                className="hidden sm:flex items-center gap-1.5 text-sm text-[#00C896] hover:text-emerald-300 transition-colors font-medium">
+                className="hidden sm:flex items-center gap-1.5 text-sm text-[#4facfe] hover:text-[#93c5fd] transition-colors font-medium">
                 {businessName && <span className="max-w-[120px] truncate text-slate-400">{businessName}</span>}
                 <span>Dashboard</span>
                 <ArrowRightIcon className="h-3.5 w-3.5" />
               </Link>
             )}
             <Link href={ctaHref}
-              className="rounded-lg bg-[#00C896] px-4 py-2 text-sm font-semibold text-[#080c10] hover:bg-[#00b386] transition-colors">
+              className="rounded-lg bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-4 py-2 text-sm font-semibold text-[#060818] hover:opacity-90 transition-all">
               {hasApp ? 'Open App' : 'Get Started'}
             </Link>
           </div>
@@ -169,21 +168,21 @@ export default async function HomePage() {
       {/* ── HERO ──────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center pt-16">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[#00C896]/10 rounded-full blur-[140px]" />
-          <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#00C896]/5 rounded-full blur-[100px]" />
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[#4facfe]/10 rounded-full blur-[140px]" />
+          <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-[#007bff]/15 rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#4facfe]/8 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#00C896]/30 bg-[#00C896]/10 px-4 py-1.5 text-xs font-medium text-[#00C896] mb-6">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#00C896] animate-pulse" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#4facfe]/30 bg-[#4facfe]/10 px-4 py-1.5 text-xs font-medium text-[#4facfe] mb-6">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#4facfe] animate-pulse" />
               Live AI Agents · Powered by Valsea
             </div>
 
             <h1 className="text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.03] tracking-tight mb-6">
               Your AI Call Center,{' '}
-              <span className="bg-gradient-to-r from-[#00C896] to-emerald-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#4facfe] to-[#00f2fe] bg-clip-text text-transparent">
                 Ready in Minutes
               </span>
             </h1>
@@ -193,7 +192,7 @@ export default async function HomePage() {
 
             <div className="flex flex-wrap gap-4">
               <Link href={ctaHref}
-                className="rounded-xl bg-[#00C896] px-6 py-3 font-semibold text-[#080c10] hover:bg-[#00b386] transition-all hover:scale-105 shadow-lg shadow-[#00C896]/25">
+                className="rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-6 py-3 font-semibold text-[#060818] hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-[#4facfe]/25">
                 {hasApp ? '→ Open Dashboard' : 'Set Up Your Agent'}
               </Link>
               <a href="#how-it-works"
@@ -203,9 +202,9 @@ export default async function HomePage() {
             </div>
 
             {hasApp && (
-              <div className="mt-6 inline-flex items-center gap-2 rounded-xl border border-[#00C896]/20 bg-[#00C896]/5 px-4 py-2.5">
-                <span className="h-2 w-2 rounded-full bg-[#00C896] animate-pulse" />
-                <span className="text-sm text-[#00C896] font-medium">
+              <div className="mt-6 inline-flex items-center gap-2 rounded-xl border border-[#4facfe]/20 bg-[#4facfe]/5 px-4 py-2.5">
+                <span className="h-2 w-2 rounded-full bg-[#4facfe] animate-pulse" />
+                <span className="text-sm text-[#4facfe] font-medium">
                   Your agent is live — <Link href="/dashboard" className="underline underline-offset-2">view dashboard</Link>
                 </span>
               </div>
@@ -213,9 +212,9 @@ export default async function HomePage() {
 
             <div className="mt-10 flex items-center gap-6">
               <div className="flex -space-x-2">
-                {['#00C896', '#3b82f6', '#f59e0b', '#ec4899'].map((c, i) => (
+                {['#4facfe', '#3b82f6', '#f59e0b', '#ec4899'].map((c, i) => (
                   <div key={i}
-                    className="h-8 w-8 rounded-full border-2 border-[#080c10] flex items-center justify-center text-xs font-bold"
+                    className="h-8 w-8 rounded-full border-2 border-[#0a1430] flex items-center justify-center text-xs font-bold"
                     style={{ backgroundColor: c }}>
                     {['R', 'M', 'S', 'A'][i]}
                   </div>
@@ -238,17 +237,17 @@ export default async function HomePage() {
                   <div className="flex justify-between items-center px-6 py-3 text-xs text-slate-500">
                     <span>9:41</span>
                     <div className="flex gap-1">
-                      <div className="h-2 w-4 rounded-sm bg-[#00C896]" />
+                      <div className="h-2 w-4 rounded-sm bg-[#4facfe]" />
                       <div className="h-2 w-1 rounded-sm bg-slate-600" />
                     </div>
                   </div>
                   <div className="text-center py-4 border-b border-white/5">
-                    <div className="mx-auto h-14 w-14 rounded-full bg-gradient-to-br from-[#00C896] to-emerald-600 flex items-center justify-center mb-2">
+                    <div className="mx-auto h-14 w-14 rounded-full bg-gradient-to-br from-[#4facfe] to-[#007bff] flex items-center justify-center mb-2">
                       <BotIcon className="h-7 w-7 text-white" />
                     </div>
                     <p className="text-sm font-semibold">CallSense Agent</p>
-                    <div className="inline-flex items-center gap-1.5 mt-1 text-xs text-[#00C896]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#00C896] animate-pulse" />
+                    <div className="inline-flex items-center gap-1.5 mt-1 text-xs text-[#4facfe]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#4facfe] animate-pulse" />
                       Connected · 0:42
                     </div>
                   </div>
@@ -262,7 +261,7 @@ export default async function HomePage() {
                       <div key={i} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed ${
                           msg.isUser
-                            ? 'bg-[#00C896]/20 text-[#00C896] rounded-br-sm'
+                            ? 'bg-[#4facfe]/20 text-[#4facfe] rounded-br-sm'
                             : 'bg-white/[0.08] text-slate-300 rounded-bl-sm'
                         }`}>
                           {msg.text}
@@ -292,11 +291,11 @@ export default async function HomePage() {
                   </div>
                 </div>
               </div>
-              <div className="absolute -left-10 top-20 rounded-xl bg-slate-800/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
-                <div className="text-[#00C896] font-semibold">24/7 Active</div>
+              <div className="absolute -left-10 top-20 rounded-xl bg-[#0c1638]/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
+                <div className="text-[#4facfe] font-semibold">24/7 Active</div>
                 <div className="text-slate-500">Never misses a call</div>
               </div>
-              <div className="absolute -right-8 bottom-24 rounded-xl bg-slate-800/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
+              <div className="absolute -right-8 bottom-24 rounded-xl bg-[#0c1638]/90 border border-white/10 px-3 py-2 text-xs backdrop-blur shadow-xl">
                 <div className="text-amber-400 font-semibold">98% Accuracy</div>
                 <div className="text-slate-500">SEA voices</div>
               </div>
@@ -331,7 +330,7 @@ export default async function HomePage() {
       <section id="how-it-works" className="py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#00C896] mb-3">Simple Process</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Simple Process</p>
             <h2 className="text-4xl font-black tracking-tight">Up and running in 2 steps</h2>
             <p className="mt-3 text-slate-400 max-w-md mx-auto">From zero to a live AI call center agent in under 5 minutes.</p>
           </div>
@@ -341,7 +340,7 @@ export default async function HomePage() {
                 step: '01', title: 'We Build Your Agent',
                 desc: 'Our AI instantly trains a custom agent on your business info, personality, and escalation rules.',
                 Icon: BotIcon,
-                gradient: 'from-blue-500/20 to-indigo-500/10', border: 'border-blue-500/30', iconColor: 'text-blue-400',
+                gradient: 'from-[#4facfe]/20 to-[#007bff]/10', border: 'border-[#4facfe]/30', iconColor: 'text-[#4facfe]',
                 link: hasApp ? '/agent' : null, linkLabel: 'Configure agent →',
               },
               {
@@ -375,7 +374,7 @@ export default async function HomePage() {
       <section id="features" className="py-28 bg-white/[0.015]">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#00C896] mb-3">Everything You Need</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Everything You Need</p>
             <h2 className="text-4xl font-black tracking-tight">Built for real businesses</h2>
             <p className="mt-3 text-slate-400 text-lg max-w-xl mx-auto">
               Enterprise-grade AI calling, designed for Southeast Asia.
@@ -397,10 +396,10 @@ export default async function HomePage() {
                 desc: "No code, no technical knowledge, no IT team. You're live in minutes with a single phone call." },
             ].map(({ Icon, title, desc, tag }) => (
               <div key={title}
-                className="group rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 hover:border-[#00C896]/40 hover:bg-[#00C896]/5 transition-all cursor-default">
+                className="group rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 hover:border-[#4facfe]/40 hover:bg-[#4facfe]/5 transition-all cursor-default">
                 <div className="mb-4 flex items-start justify-between">
-                  <div className="h-11 w-11 rounded-xl bg-[#00C896]/10 flex items-center justify-center group-hover:bg-[#00C896]/20 transition-colors">
-                    <Icon className="h-5 w-5 text-[#00C896]" />
+                  <div className="h-11 w-11 rounded-xl bg-[#4facfe]/10 flex items-center justify-center group-hover:bg-[#4facfe]/20 transition-colors">
+                    <Icon className="h-5 w-5 text-[#4facfe]" />
                   </div>
                   <span className="rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] font-medium text-slate-500">{tag}</span>
                 </div>
@@ -416,7 +415,7 @@ export default async function HomePage() {
       <section className="py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#00C896] mb-3">Use Cases</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Use Cases</p>
             <h2 className="text-4xl font-black tracking-tight">Works for every business</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -445,11 +444,11 @@ export default async function HomePage() {
 
       {/* ── LIVE DEMO STRIP (only when app is set up) ─────────────── */}
       {hasApp && (
-        <section className="py-16 border-y border-[#00C896]/15 bg-[#00C896]/5">
+        <section className="py-16 border-y border-[#4facfe]/15 bg-[#4facfe]/5">
           <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#00C896]/30 bg-[#00C896]/10 px-3 py-1 text-xs font-medium text-[#00C896] mb-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#00C896] animate-pulse" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#4facfe]/30 bg-[#4facfe]/10 px-3 py-1 text-xs font-medium text-[#4facfe] mb-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#4facfe] animate-pulse" />
                 Your agent is live
               </div>
               <h3 className="text-2xl font-black">Try your AI agent right now</h3>
@@ -457,7 +456,7 @@ export default async function HomePage() {
             </div>
             <div className="flex flex-wrap gap-3 shrink-0">
               <Link href="/dashboard"
-                className="rounded-xl bg-[#00C896] px-5 py-2.5 text-sm font-bold text-[#080c10] hover:bg-[#00b386] transition-colors shadow-lg shadow-[#00C896]/25">
+                className="rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-5 py-2.5 text-sm font-bold text-[#060818] hover:opacity-90 transition-colors shadow-lg shadow-[#4facfe]/25">
                 Simulate a Call
               </Link>
               <Link href="/call-logs"
@@ -477,7 +476,7 @@ export default async function HomePage() {
       <section id="pricing" className="py-28 bg-white/[0.015]">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#00C896] mb-3">Pricing</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-3">Pricing</p>
             <h2 className="text-4xl font-black tracking-tight">Simple, transparent pricing</h2>
             <p className="mt-3 text-slate-400 text-lg">Start free. Scale when you&apos;re ready.</p>
           </div>
@@ -491,7 +490,7 @@ export default async function HomePage() {
               <ul className="space-y-3 flex-1 mb-8">
                 {['1 AI agent', '100 calls / month', 'Basic analytics', 'Email support'].map((f) => (
                   <li key={f} className="flex items-center gap-3 text-sm text-slate-400">
-                    <CheckIcon className="h-4 w-4 text-[#00C896] shrink-0" />{f}
+                    <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
                   </li>
                 ))}
               </ul>
@@ -501,12 +500,12 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className="relative rounded-2xl border-2 border-[#00C896] bg-gradient-to-b from-[#00C896]/10 to-transparent p-8 flex flex-col shadow-xl shadow-[#00C896]/10">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-[#00C896] px-4 py-1 text-[11px] font-bold text-[#080c10] uppercase tracking-wide">
+            <div className="relative rounded-2xl border-2 border-[#4facfe] bg-gradient-to-b from-[#4facfe]/10 to-transparent p-8 flex flex-col shadow-xl shadow-[#4facfe]/10">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-4 py-1 text-[11px] font-bold text-[#060818] uppercase tracking-wide">
                 Most Popular
               </div>
               <div className="mb-6">
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#00C896] mb-2">Growth</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-2">Growth</p>
                 <div className="flex items-end gap-1">
                   <p className="text-4xl font-black">$49</p>
                   <p className="text-slate-400 mb-1">/mo</p>
@@ -516,12 +515,12 @@ export default async function HomePage() {
               <ul className="space-y-3 flex-1 mb-8">
                 {['5 AI agents', 'Unlimited calls', 'Sentiment analysis', 'Call summaries', 'Priority support', 'Custom voice'].map((f) => (
                   <li key={f} className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckIcon className="h-4 w-4 text-[#00C896] shrink-0" />{f}
+                    <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
                   </li>
                 ))}
               </ul>
               <Link href={ctaHref}
-                className="block text-center rounded-xl bg-[#00C896] py-3 text-sm font-bold text-[#080c10] hover:bg-[#00b386] transition-colors shadow-lg shadow-[#00C896]/30">
+                className="block text-center rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] py-3 text-sm font-bold text-[#060818] hover:opacity-90 transition-colors shadow-lg shadow-[#4facfe]/30">
                 {hasApp ? 'Open Dashboard' : 'Start Free Trial'}
               </Link>
             </div>
@@ -535,7 +534,7 @@ export default async function HomePage() {
               <ul className="space-y-3 flex-1 mb-8">
                 {['Unlimited agents', 'Custom voices', 'Dedicated support', 'SLA guarantee', 'On-premise option', 'White-label'].map((f) => (
                   <li key={f} className="flex items-center gap-3 text-sm text-slate-400">
-                    <CheckIcon className="h-4 w-4 text-[#00C896] shrink-0" />{f}
+                    <CheckIcon className="h-4 w-4 text-[#4facfe] shrink-0" />{f}
                   </li>
                 ))}
               </ul>
@@ -551,10 +550,10 @@ export default async function HomePage() {
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="py-28">
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <div className="relative rounded-3xl border border-[#00C896]/20 bg-gradient-to-b from-[#00C896]/10 to-transparent p-16 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#00C896]/5 via-transparent to-indigo-500/5 pointer-events-none" />
-            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#00C896]/15 rounded-full blur-[80px] pointer-events-none" />
-            <p className="relative text-xs font-semibold uppercase tracking-widest text-[#00C896] mb-4">
+          <div className="relative rounded-3xl border border-[#4facfe]/20 bg-gradient-to-b from-[#4facfe]/10 to-transparent p-16 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#4facfe]/5 via-transparent to-[#007bff]/5 pointer-events-none" />
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#4facfe]/15 rounded-full blur-[80px] pointer-events-none" />
+            <p className="relative text-xs font-semibold uppercase tracking-widest text-[#4facfe] mb-4">
               {hasApp ? 'You\'re All Set' : 'Get Started Today'}
             </p>
             <h2 className="relative text-4xl md:text-5xl font-black tracking-tight mb-4">
@@ -568,7 +567,7 @@ export default async function HomePage() {
                 : 'No credit card required. Your agent goes live in minutes.'}
             </p>
             <Link href={ctaHref}
-              className="relative inline-block rounded-xl bg-[#00C896] px-8 py-4 text-base font-bold text-[#080c10] hover:bg-[#00b386] transition-all hover:scale-105 shadow-xl shadow-[#00C896]/30">
+              className="relative inline-block rounded-xl bg-gradient-to-r from-[#4facfe] to-[#00c6fb] px-8 py-4 text-base font-bold text-[#060818] hover:opacity-90 transition-all hover:scale-105 shadow-xl shadow-[#4facfe]/30">
               {hasApp ? 'Open Dashboard →' : 'Get Started Free →'}
             </Link>
           </div>
@@ -579,7 +578,7 @@ export default async function HomePage() {
       <footer className="border-t border-white/5 py-10">
         <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#00C896] text-xs font-black text-[#080c10]">CS</span>
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#4facfe] to-[#007bff] text-xs font-black text-white">CS</span>
             <span className="font-bold text-sm">CallSense</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-slate-500">
@@ -587,7 +586,7 @@ export default async function HomePage() {
               <a key={link} href="#" className="hover:text-slate-300 transition-colors">{link}</a>
             ))}
             {hasApp && (
-              <Link href="/dashboard" className="text-[#00C896] hover:text-emerald-300 transition-colors font-medium">
+              <Link href="/dashboard" className="text-[#4facfe] hover:text-[#93c5fd] transition-colors font-medium">
                 Dashboard
               </Link>
             )}
